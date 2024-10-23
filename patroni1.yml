@@ -1,0 +1,84 @@
+scope: cluster-dev
+name: pgnode1
+
+restapi:
+  listen: 192.168.11.2:8008
+  connect_address: 192.168.11.2:8008
+#  cafile: /etc/ssl/easy-ca.crt
+#  certfile: /etc/ssl/easy-pgnode1.crt
+#  keyfile: /etc/ssl/easy-pgnode1.key
+#  verify_client: optional
+#  ciphers: TLS_AES_256_GCM_SHA384:!SSLv1:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1
+
+#ctl:
+#  insecure: false
+#  cacert: /etc/ssl/ca.pem
+#  cert: /etc/ssl/client.pem
+#  key: /etc/ssl/client-key.pem
+
+etcd3:
+  host: 192.168.11.2:2379
+  protocol: https
+  cacert: /etc/ssl/ca.pem
+  cert: /etc/ssl/client.pem
+  key: /etc/ssl/client-key.pem
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+#    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      max_connections: 100
+      max_locks_per_transaction: 64
+      max_worker_processes: 8
+      max_prepared_transactions: 0
+      wal_level: hot_standby
+      track_commit_timestamp: off
+      log_min_duration_statement: 500 
+      pg_hba:
+      - local all all peer
+      - host all all 127.0.0.1/32 trust
+      - host replication replicator 127.0.0.1/32 md5
+      - host replication replicator 192.168.11.0/24 md5
+      - host replication streaming_barman 127.0.0.1/32 md5
+      - host replication streaming_barman 192.168.11.0/24 md5
+      - hostssl all all 192.168.11.0/24 md5
+      - host all all 0.0.0.0/0 md5
+      #  - hostssl all all 0.0.0.0/0 md5
+      use_slots: true
+      parameters:
+        wal_keep_segments: 200
+        archive_command: "rsync -a %p barman@192.168.11.5:/var/lib/barman/cluster-dev/incoming/%f"
+
+  initdb:
+  - encoding: UTF8
+  - data-checksums
+
+postgresql:
+  listen: 127.0.0.1,192.168.11.2:5432
+  connect_address: 192.168.11.2:5432
+  data_dir: /data/database/pgdata
+  bin_dir: /usr/pgsql-16/bin
+  pgpass: /var/lib/pgsql/.pgpass
+  authentication:
+    replication:
+      username: replicator
+      password: uP?T8nY9S?HbU?SSKjFpXFkB=k78qkp2
+    superuser:
+      username: postgres
+      password: patroni
+    rewind:  # Has no effect on postgres 10 and lower
+      username: rewind_user
+      password: rewind_password
+  parameters:
+    unix_socket_directories: '/run/postgresql'
+    ssl: true
+    ssl_ca_file: /etc/ssl/easy-ca.crt
+    ssl_cert_file: /etc/ssl/easy-pgnode1.crt
+    ssl_key_file: /etc/ssl/easy-pgnode1.key
+    ssl_min_protocol_version: TLSv1.3
+    ssl_prefer_server_ciphers: true
+
