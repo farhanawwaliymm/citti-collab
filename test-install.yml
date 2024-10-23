@@ -1,1 +1,217 @@
+---
+- name: Install and Config Patroni
+  hosts: all
+  gather_facts: false  # Disable gathering facts to speed up the test
+  become: yes
+  become_user: root
 
+  tasks:
+    - name: Disable PostgreSQL module in DNF configuration
+      command: "dnf -qy module disable postgresql"
+
+    - name: Enable RHEL8 Extras PostgreSQL Repository
+      command: "subscription-manager repos --enable=pgdg-rhel8-extras"
+
+#    - name: Enable PostgreSQL Repository
+#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
+
+#    - name: Enable Pgdg Repository
+#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-pgdg-rhel8-extras"
+
+    - name: Install PostgreSQL 16 server, client, and contrib
+      yum:
+        name:
+          - postgresql16-server
+          - postgresql16
+          - postgresql16-contrib
+        state: present
+        disable_gpg_check: true
+    
+    - name: Install Patroni ETCD
+      yum:
+        name: patroni-etcd
+        state: present
+        disable_gpg_check: true
+    
+    - name: Install Patroni
+      yum:
+        name: patroni-3.2.2
+        state: present
+        disable_gpg_check: true
+
+    #- name: Install Pgbackrest
+    #  yum:
+    #    name: pgbackrest
+    #    state: present
+    #  tags: pgbackrest
+    
+    - name: Install Python3 ETCD
+      yum:
+        name: python3-etcd
+        state: present
+        disable_gpg_check: true
+
+    - name: Install Pg Cron
+      yum:
+        name: pg_cron_16
+        state: present
+        disable_gpg_check: true
+
+    - name: Install Pg Top
+      yum:
+        name: pg_top
+        state: present
+        disable_gpg_check: true
+    
+    - name: Install Check Postgres
+      yum:
+        name: check_postgres
+        state: present
+        disable_gpg_check: true
+       
+    #- name: Install python3-etcd from RPM
+    #  yum:
+    #    name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+    #    state: present 
+    #    disable_gpg_check: true      
+   
+    #- name: Run pip install command
+    #  command: python3 -m pip install patroni[etcd]
+    
+    - name: Create directory for patroni
+      file:
+        path: "/etc/patroni"
+        state: directory
+
+    - name: Set ownership for patroni
+      file:
+        path: "/etc/patroni"
+        owner: "patroni"
+        group: "patroni"
+        recurse: yes
+    
+    - name: Create data directory for patroni
+      file:
+        path: "/psql/citti/data"
+        state: directory
+
+    - name: Set ownership of data directory for patroni 
+      file:
+        path: "/psql/citti/data"
+        owner: "postgres"
+        group: "postgres"
+        recurse: yes
+
+    - name: Set permissions of data directory for patroni
+      file:
+        path: "/psql/citti/data"
+        mode: "700"
+
+    - name: Create data directory for PG Archive
+      file:
+        path: "/psqlarchive/citti/archive"
+        state: directory
+
+    - name: Set ownership of data directory for PG Archive 
+      file:
+        path: "/psqlarchive/citti/archive"
+        owner: "postgres"
+        group: "postgres"
+        recurse: yes
+
+    - name: Set permissions of data directory for PG Archive
+      file:
+        path: "/psqlarchive/citti/archive"
+        mode: "700"
+   
+    - name: Create Patroni configuration file
+      file:
+        path: "/etc/patroni/patroni-citti.yml"
+        owner: "patroni"
+        group: "patroni"
+        state: touch        
+                  
+    - name: Delete all existing lines in the config file
+      lineinfile:
+        path: "{{ cleaned_path_patroni }}/{{ cleaned_patroni_config_file }}" 
+        regexp: '.*'
+        state: absent  
+    - name: Create Patroni service file
+      file:
+        path: "{{ cleaned_path_service }}/{{ cleaned_new_service_name }}"
+        owner: "root"
+        group: "root"
+        state: touch
+    
+    - name: Set permissions of patroni service file
+      file:
+        path: "{{ cleaned_path_service }}/{{ cleaned_new_service_name }}"
+        mode: "644"
+
+    - name: Delete all existing lines in the service file
+      lineinfile:
+        path: "{{ cleaned_path_service }}/{{ cleaned_new_service_name }}" 
+        regexp: '.*'
+        state: absent
+        
+    - name: Ensure lines are present in Patroni service file
+      blockinfile: 
+        path: "{{ cleaned_path_service }}/{{ cleaned_new_service_name }}"
+        insertafter: EOF
+        block: |
+          # It's not recommended to modify this file in-place, because it will be
+          # overwritten during package upgrades.  It is recommended to use systemd
+          # "dropin" feature;  i.e. create file with suffix .conf under
+          # /etc/systemd/system/patroni.service.d directory overriding the
+          # unit's defaults. You can also use "systemctl edit patroni"
+          # Look at systemd.unit(5) manual page for more info.
+
+          [Unit]
+          Description=Runners to orchestrate a high-availability PostgreSQL
+          After=syslog.target network.target
+
+          [Service]
+          Type=simple
+
+          User=postgres
+          Group=postgres
+
+          # Read in configuration file if it exists, otherwise proceed
+          EnvironmentFile=-/etc/patroni_env.conf
+
+          # WorkingDirectory=/var/lib/pgsql
+
+          # Where to send early-startup messages from the server
+          # This is normally controlled by the global default set by systemd
+          #StandardOutput=syslog
+
+          # Pre-commands to start watchdog device
+          # Uncomment if watchdog is part of your patroni setup
+          #ExecStartPre=-/usr/bin/sudo /sbin/modprobe softdog
+          #ExecStartPre=-/usr/bin/sudo /bin/chown postgres /dev/watchdog
+
+          # Start the patroni process
+          ExecStart=/usr/bin/patroni {{ cleaned_path_patroni }}/{{ cleaned_patroni_config_file }}
+
+          # Send HUP to reload from patroni.yml
+          ExecReload=/usr/bin/kill -s HUP $MAINPID
+
+          # only kill the patroni process, not it's children, so it will gracefully stop postgres
+          KillMode=process
+
+          # Give a reasonable amount of time for the server to start up/shut down
+          TimeoutSec=30
+
+          # Do not restart the service if it crashes, we want to manually inspect database on failure
+          Restart=no
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Remove default patroni service file
+      command: "rm -rf {{ cleaned_path_service }}/patroni.service" 
+
+    - name: Enable patroni service
+      systemd:
+        name: "{{ cleaned_new_service_name }}"
+        enabled: yes
