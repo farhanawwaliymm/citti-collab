@@ -1,0 +1,19 @@
+-- CREATE USER
+CREATE USER enterpriceuser WITH ENCRYPTED PASSWORD '{{ user_password }}';
+
+-- CREATE DATABASES
+CREATE DATABASE enterprice_nightly;
+CREATE DATABASE enterprice_test;
+CREATE DATABASE enterprice_demo;
+CREATE DATABASE keycloak;
+
+-- GRANT PRIVILEGES
+{% for database in databases %}
+GRANT ALL PRIVILEGES ON DATABASE {{ database }} TO enterpriceuser;
+{% endfor %}
+
+-- CONNECT TO DATABASES AND CREATE SCHEMAS
+{% for database in databases %}
+\connect {{ database }};
+CREATE SCHEMA IF NOT EXISTS enterprice AUTHORIZATION enterpriceuser;
+{% endfor %}

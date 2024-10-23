@@ -1,0 +1,36 @@
+- name: Include EnterPrice vars
+  ansible.builtin.include_vars:
+    file: eps_vars.yml
+    name: eps_vars
+
+- name: Create PostgreSQL directories
+  ansible.builtin.file:
+    path: "{{ eps_vars.postgresql_tmp_eps_dir }}"
+    state: directory
+    owner: "{{ postgresql_dir_owner }}"
+    group: "{{ postgresql_dir_owner }}"
+    mode: "{{ postgresql_dir_permissions }}"
+
+- name: Create database users, databases and schemas
+  ansible.builtin.template:
+    src: 1-initdb.sql.j2
+    dest: "{{ eps_vars.postgresql_tmp_eps_dir }}1-initdb.sql"
+    owner: "{{ postgresql_dir_owner }}"
+    group: "{{ postgresql_dir_owner }}"
+    mode: "{{ postgresql_file_permissions }}"
+  vars:
+    user_password: "{{ eps_vars.postgresql_eps_pw }}"
+    databases: "{{ eps_vars.postgresql_eps_databases }}"
+  register: eps_db_creation
+  notify:
+    - Clean up dir
+
+- name: EPS database creation
+  ansible.builtin.debug:
+    msg: "{{ eps_db_creation }}"
+
+- name: Import SQL file into PostgreSQL database
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && echo '\\i {{ eps_vars.postgresql_tmp_eps_dir }}1-initdb.sql' | sudo -u postgres psql"
+    executable: /bin/bash
+  changed_when: eps_db_creation.failed == "false"

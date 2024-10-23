@@ -1,0 +1,12 @@
+---
+- name: Include EnterPrice vars
+  ansible.builtin.include_vars:
+    file: eps_vars.yml
+    name: eps_vars
+
+- name: Restore the database
+  community.postgresql.postgresql_db:
+    state: restore
+    name: "{{ item }}"
+    target: "{{ eps_vars.postgresql_dump_dir }}{{ item }}_dump.sql"
+  loop: "{{ eps_vars.postgresql_eps_databases }}"

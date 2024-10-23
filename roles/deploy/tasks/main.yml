@@ -1,0 +1,12 @@
+---
+- name: "PostgreSQL {{ postgresql_action }}"
+  ansible.builtin.include_tasks: "{{ postgresql_action }}.yml"
+  tags:
+    - postgresql
+  loop:
+    - uninstall
+    - install
+    - initialize_eps
+    - dump
+    - restore
+  when: postgresql_action == item
