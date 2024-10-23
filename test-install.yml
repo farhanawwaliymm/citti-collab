@@ -131,8 +131,8 @@
     - name: Create Patroni configuration file
       file:
         path: "/etc/patroni/patroni-citti.yml"
-        owner: "patroni"
-        group: "patroni"
+        owner: "root"
+        group: "root"
         state: touch        
                   
 #    - name: Delete all existing lines in the config file
