@@ -90,8 +90,8 @@
     - name: Set ownership for patroni
       file:
         path: "/etc/patroni"
-        owner: "patroni"
-        group: "patroni"
+        owner: "root"
+        group: "root"
         recurse: yes
     
     - name: Create data directory for patroni
