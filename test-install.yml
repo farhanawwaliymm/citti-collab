@@ -9,8 +9,11 @@
     - name: Disable PostgreSQL module in DNF configuration
       command: "dnf -qy module disable postgresql"
 
-    - name: Enable RHEL8 Extras PostgreSQL Repository
+    - name: Enable RHEL8 Extras Repository
       command: "subscription-manager repos --enable=pgdg-rhel8-extras"
+
+    - name: Install PostgreSQL Repository
+      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
 
 #    - name: Enable PostgreSQL Repository
 #      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
