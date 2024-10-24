@@ -77,7 +77,7 @@
       yum:
         name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
         state: present 
-        disable_gpg_check: true      
+        disable_gpg_check: false      
    
     - name: Run pip install command
       command: python3 -m pip install patroni[etcd]
