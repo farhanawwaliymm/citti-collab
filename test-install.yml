@@ -190,10 +190,10 @@
 #                  max_parallel_workers: 1
 #                  max_parallel_maintenance_workers: 1
           
-            initdb :
-            - auth: scram-sha-256
-            - encoding: UTF8
-            - data-checksums
+          initdb :
+          - auth: scram-sha-256
+          - encoding: UTF8
+          - data-checksums
             
             pg_hba:
 #            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
