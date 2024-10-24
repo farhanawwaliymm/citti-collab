@@ -191,7 +191,7 @@
 #                  max_parallel_maintenance_workers: 1
           
             initdb :
-            - auth: scram-sha-256
+              - auth: scram-sha-256
             - encoding: UTF8
             - data-checksums
             
