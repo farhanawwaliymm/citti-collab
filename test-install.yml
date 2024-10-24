@@ -225,7 +225,7 @@
               track_activity_query_size: 2048
               pg_stat_statements.track: all
           
-          tags:
+            tags:
               nofailover: false
               noloadbalance: false
               clonefrom: false
