@@ -168,12 +168,7 @@
                 use_pg_rewind: true
                 use_slots: true
                 parameters:
- 
-            initdb :
-                - auth: scram-sha-256
-            - encoding: UTF8
-            - data-checksums
-#                  password_encryption: scram-sha-256
+                  password_encryption: scram-sha-256
 #                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
 #                  archive_mode: true
 #                  restore_command: gunzip < {{ cleaned_path_archive }}/%f'.gz' > %p
@@ -194,8 +189,13 @@
 #                  max_parallel_workers_per_gather: 1
 #                  max_parallel_workers: 1
 #                  max_parallel_maintenance_workers: 1
+        initdb :
+        - auth: scram-sha-256
+        - encoding: UTF8
+        - data-checksums
+
                       
-            pg_hba:
+        pg_hba:
 #            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
 #            - host all all {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
 #            - host all all {{ cleaned_ip_patroni_dr }}/32 scram-sha-256
@@ -206,7 +206,7 @@
             - host replication replicator 192.168.1.22/32 scram-sha-256
             - host replication replicator 192.168.1.23/32 scram-sha-256
 
-          postgresql:
+        postgresql:
             listen: 192.168.1.21:5432
             connect_address: 192.168.1.21:5432
             data_dir: /psql/citti/data/
