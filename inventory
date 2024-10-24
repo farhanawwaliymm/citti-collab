@@ -1,0 +1,17 @@
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+
+[consul-clients:children]
+pgsql_servers
+
+[dcs_servers]
+master
+
+[pgsql_servers]
+pg1
+pg2
+pg3
+
+#[haproxy_server]
+#master
