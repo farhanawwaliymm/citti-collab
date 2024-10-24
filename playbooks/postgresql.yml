@@ -1,3 +1,0 @@
-- hosts: postgresql
-  roles:
-   - ccgroups_compute.postgresql.deploy
