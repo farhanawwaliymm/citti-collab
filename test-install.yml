@@ -168,6 +168,11 @@
                 use_pg_rewind: true
                 use_slots: true
                 parameters:
+ 
+            initdb :
+                - auth: scram-sha-256
+            - encoding: UTF8
+            - data-checksums
 #                  password_encryption: scram-sha-256
 #                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
 #                  archive_mode: true
@@ -189,12 +194,7 @@
 #                  max_parallel_workers_per_gather: 1
 #                  max_parallel_workers: 1
 #                  max_parallel_maintenance_workers: 1
-          
-            initdb :
-              - auth: scram-sha-256
-            - encoding: UTF8
-            - data-checksums
-            
+                      
             pg_hba:
 #            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
 #            - host all all {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
