@@ -146,16 +146,16 @@
         path: "/etc/patroni/patroni-citti.yml"
         insertafter: EOF
         block: |
-          scope: {{ cleaned_scope }}
-          namespace: /{{ cleaned_namespace }}/
-          name: {{ cleaned_node_name }}
+          scope: citti
+          namespace: /clusterdev/
+          name: pgnode1
 
          restapi:
-              listen: {{ cleaned_ip_patroni }}:{{ cleaned_port_patroni }}
-              connect_address: {{ cleaned_ip_patroni }}:{{ cleaned_port_patroni }}
+              listen: 192.168.1.21:8008
+              connect_address: 192.168.1.21:8008
 
           etcd:
-              hosts: {{ cleaned_ip_etcd_1 }}:{{ cleaned_port_etcd }},{{ cleaned_ip_etcd_2 }}:{{ cleaned_port_etcd }},{{ cleaned_ip_etcd_3 }}:{{ cleaned_port_etcd }}
+              hosts: 192.168.1.21:2379,192.168.1.22:2379,192.168.1.23:2379
           #    host: {{ cleaned_ip_etcd_dr }}:{{ cleaned_port_etcd }}
 
           bootstrap:
@@ -169,26 +169,26 @@
                 use_slots: true
                 parameters:
                   password_encryption: scram-sha-256
-                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
+#                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
                   archive_mode: true
-                  restore_command: gunzip < {{ cleaned_path_archive }}/%f'.gz' > %p
-                  max_connections: {{ cleaned_max_connections }}
-                  shared_buffers: {{ cleaned_shared_buffers }}
-                  effective_cache_size: {{ cleaned_effective_cache_size }}
-                  maintenance_work_mem: {{ cleaned_maintenance_work_mem }}
-                  checkpoint_completion_target: {{ cleaned_checkpoint_completion_target }}
-                  wal_buffers: {{ cleaned_wal_buffers }}
-                  default_statistics_target: {{ cleaned_default_statistics_target }}
-                  random_page_cost: {{ cleaned_random_page_cost }}
-                  effective_io_concurrency: {{ cleaned_effective_io_concurrency }}
-                  work_mem: {{ cleaned_work_mem }}
-                  huge_pages: {{ cleaned_huge_pages | lower }}
-                  min_wal_size: {{ cleaned_min_wal_size }}
-                  max_wal_size: {{ cleaned_max_wal_size }}
-                  max_worker_processes: {{ cleaned_max_worker_processes }}
-                  max_parallel_workers_per_gather: {{ cleaned_max_parallel_workers_per_gather }}
-                  max_parallel_workers: {{ cleaned_max_parallel_workers }}
-                  max_parallel_maintenance_workers: {{ cleaned_max_parallel_maintenance_workers }}
+#                  restore_command: gunzip < {{ cleaned_path_archive }}/%f'.gz' > %p
+                  max_connections: 100
+                  shared_buffers: 512MB
+                  effective_cache_size: 1.5GB
+                  maintenance_work_mem: 128MB
+                  checkpoint_completion_target: 0.9
+                  wal_buffers: 16MB
+                  default_statistics_target: 100
+                  random_page_cost: 1.1
+                  effective_io_concurrency: 200
+                  work_mem: 2621kB
+                  huge_pages: off
+                  min_wal_size: 512MB
+                  max_wal_size: 1GB
+                  max_worker_processes: 2
+                  max_parallel_workers_per_gather: 1
+                  max_parallel_workers: 1
+                  max_parallel_maintenance_workers: 1
           
             initdb :
             - auth: scram-sha-256
@@ -196,21 +196,21 @@
             - data-checksums
             
             pg_hba:
-            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
-            - host all all {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
-            - host all all {{ cleaned_ip_patroni_dr }}/32 scram-sha-256
-            - host all all {{ cleaned_ip_subnet }}/24 scram-sha-256
-            - host all all {{ cleaned_ip_subnet_dr }}/24 scram-sha-256
+#            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
+#            - host all all {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
+#            - host all all {{ cleaned_ip_patroni_dr }}/32 scram-sha-256
+#            - host all all {{ cleaned_ip_subnet }}/24 scram-sha-256
+            - host all all 192.168.1.0/24 scram-sha-256
             - host replication replicator 127.0.0.1/32 scram-sha-256
-            - host replication replicator {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
-            - host replication replicator {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
-            - host replication replicator {{ cleaned_ip_patroni_dr }}/32 scram-sha-256
+            - host replication replicator 192.168.1.21/32 scram-sha-256
+            - host replication replicator 192.168.1.22/32 scram-sha-256
+            - host replication replicator 192.168.1.23/32 scram-sha-256
 
           postgresql:
-            listen: {{ cleaned_ip_patroni }}:{{ cleaned_port_postgresql }}
-            connect_address: {{ cleaned_ip_patroni }}:{{ cleaned_port_postgresql }}
-            data_dir: {{ cleaned_path_data_dir_patroni }}
-            bin_dir: {{ cleaned_path_bin_dir_patroni }}
+            listen: 192.168.1.21:5432
+            connect_address: 192.168.1.21:5432
+            data_dir: /psql/citti/data/
+            bin_dir: /usr/pgsql-16/bin
             pgpass: /tmp/pgpass
             authentication:
               replication:
