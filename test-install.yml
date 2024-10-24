@@ -156,7 +156,7 @@
 
           etcd:
               hosts: 192.168.1.21:2379,192.168.1.22:2379,192.168.1.23:2379
-          #    host: {{ cleaned_ip_etcd_dr }}:{{ cleaned_port_etcd }}
+          #    host: 192.168.1.21:2379
 
           bootstrap:
             dcs:
@@ -186,9 +186,9 @@
                   max_parallel_workers_per_gather: 1
                   max_parallel_workers: 1
                   max_parallel_maintenance_workers: 1
-#                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
+#                  archive_command: gzip < %p > {/psqlarchive/citti/archive/%f'.gz'
 #                  archive_mode: true
-#                  restore_command: gunzip < {{ cleaned_path_archive }}/%f'.gz' > %p
+#                  restore_command: gunzip < /psqlarchive/citti/archive/%f'.gz' > %p
         initdb :
         - auth: scram-sha-256
         - encoding: UTF8
@@ -196,10 +196,6 @@
 
                       
         pg_hba:
-#            - host all all {{ cleaned_ip_patroni_1 }}/32 scram-sha-256
-#            - host all all {{ cleaned_ip_patroni_2 }}/32 scram-sha-256
-#            - host all all {{ cleaned_ip_patroni_dr }}/32 scram-sha-256
-#            - host all all {{ cleaned_ip_subnet }}/24 scram-sha-256
             - host all all 192.168.1.0/24 scram-sha-256
             - host replication replicator 127.0.0.1/32 scram-sha-256
             - host replication replicator 192.168.1.21/32 scram-sha-256
@@ -241,7 +237,7 @@
         state: touch
 
 #    - name: Remove default patroni service file
-#      command: "cp {{ cleaned_path_service }}/patroni.service" 
+#      command: "cp /usr/lib/systemd/system/patroni.service" 
 #    - name: Copy file with owner and permissions
 #      ansible.builtin.copy:
 #        src: /usr/lib/systemd/system/patroni.service
@@ -255,11 +251,11 @@
         path: "/usr/lib/systemd/system/patroni-citti.service"
         mode: "0644"
 
-#    - name: Delete all existing lines in the service file
-#     lineinfile:
-#        path: "{{ cleaned_path_service }}/{{ cleaned_new_service_name }}" 
-#        regexp: '.*'
-#        state: absent
+    - name: Delete all existing lines in the service file
+      lineinfile:
+        path: "/usr/lib/systemd/system/patroni-citti.service" 
+        regexp: '.*'
+        state: absent
         
     - name: Ensure lines are present in Patroni service file
       blockinfile: 
