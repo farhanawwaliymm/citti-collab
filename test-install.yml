@@ -170,7 +170,7 @@
                 parameters:
                   password_encryption: scram-sha-256
 #                  archive_command: gzip < %p > {{ cleaned_path_archive }}/%f'.gz'
-                  archive_mode: true
+#                  archive_mode: true
 #                  restore_command: gunzip < {{ cleaned_path_archive }}/%f'.gz' > %p
                   max_connections: 100
                   shared_buffers: 512MB
