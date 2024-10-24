@@ -150,7 +150,7 @@
           namespace: /clusterdev/
           name: pgnode1
 
-         restapi:
+          restapi:
               listen: 192.168.1.21:8008
               connect_address: 192.168.1.21:8008
 
