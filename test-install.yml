@@ -15,6 +15,10 @@
     - name: Enable RHEL8 Extras Repository
       command: "dnf config-manager --enable pgdg-rhel8-extras"
 
+#    - name: Install ETCD
+#      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+  
+
 
 #    - name: Enable PostgreSQL Repository
 #      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
@@ -31,7 +35,13 @@
         state: present
         disable_gpg_check: true
     
-    - name: Install Patroni ETCD
+        - name: Install ETCD
+        yum:
+          name: etcd
+          state: present
+          disable_gpg_check: true
+
+        - name: Install Patroni ETCD
       yum:
         name: patroni-etcd
         state: present
