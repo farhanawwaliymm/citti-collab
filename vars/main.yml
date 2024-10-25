@@ -10,3 +10,6 @@ package_install:
   - pg_cron_16
   - pg_top
   - check_postgres
+postgresql_repo: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+pgdg_repo_extra: pgdg-rhel8-extras
+python3_etcd_package: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
