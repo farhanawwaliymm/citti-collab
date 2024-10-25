@@ -1,0 +1,364 @@
+---
+- name: Install and Config Patroni
+  hosts: all
+  gather_facts: false  # Disable gathering facts to speed up the test
+  become: yes
+  become_user: root
+
+  tasks:
+######## OS SETUP ###########
+
+    - name: Disable PostgreSQL module in DNF configuration
+      ansible.builtin.command: "dnf -qy module disable postgresql"
+      register: disable_postgre_module_dnf
+
+    # - name: Install PostgreSQL Repository
+    #   command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    - name: install PostgreSQL Repository
+      ansible.builtin.dnf:
+        name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+        state: present
+      register: install_postgre_repo
+
+    # - name: Enable RHEL8 Extras Repository
+    #   command: "dnf config-manager --enable pgdg-rhel8-extras"
+    - name: Enable RHEL8 Extras Repository
+      community.general.dnf_config_manager:
+        name: pgdg-rhel8-extras
+        state: enabled
+      register: enabled-pgdg-repo
+
+#    - name: Install ETCD
+#      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+
+#    - name: Enable PostgreSQL Repository
+#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
+
+#    - name: Enable Pgdg Repository
+#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-pgdg-rhel8-extras"
+
+    - name: install needed package
+      ansible.biltin.dnf:
+        name: "{{ package_install }}"
+        state: present
+        disable_gpg_check: true
+      register: installed_needed_package
+
+    # - name: Install PostgreSQL 16 server, client, and contrib
+    #   yum:
+    #     name:
+    #       - postgresql16-server
+    #       - postgresql16
+    #       - postgresql16-contrib
+    #     state: present
+    #     disable_gpg_check: true
+
+    # - name: Install ETCD
+    #   yum:
+    #     name: etcd
+    #     state: present
+    #     disable_gpg_check: false
+
+    # - name: Install Patroni ETCD
+    #   yum:
+    #     name: patroni-etcd
+    #     state: present
+    #     disable_gpg_check: true
+
+    # - name: Install Patroni
+    #   yum:
+    #     name: patroni-3.2.2
+    #     state: present
+    #     disable_gpg_check: true
+
+    #- name: Install Pgbackrest
+    #  yum:
+    #    name: pgbackrest
+    #    state: present
+    #  tags: pgbackrest
+
+    # - name: Install Python3 ETCD
+    #   yum:
+    #     name: python3-etcd
+    #     state: present
+    #     disable_gpg_check: true
+
+    # - name: Install Pg Cron
+    #   yum:
+    #     name: pg_cron_16
+    #     state: present
+    #     disable_gpg_check: true
+
+    # - name: Install Pg Top
+    #   yum:
+    #     name: pg_top
+    #     state: present
+    #     disable_gpg_check: true
+
+    # - name: Install Check Postgres
+    #   yum:
+    #     name: check_postgres
+    #     state: present
+    #     disable_gpg_check: true
+
+    - name: install python3-etcd from RPM
+      ansible.builtin.dnf:
+        name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+        state: present
+        disable_gpg_check: true
+      register: install_python3-etcd_rpm
+
+    # - name: Install python3-etcd from RPM
+    #   yum:
+    #     name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+    #     state: present
+    #     disable_gpg_check: false
+
+    - name: Run pip install to install patroni etcd
+      ansible.builtin.pip:
+        name: patroni[etcd]
+        state: present
+      register: pip_install_patroni_etcd
+
+    # - name: Run pip install command
+    #   command: python3 -m pip install patroni[etcd]
+
+    - name: Create directory for patroni
+      file:
+        path: "/etc/patroni"
+        state: directory
+
+    - name: Set ownership for patroni
+      file:
+        path: "/etc/patroni"
+        owner: "root"
+        group: "root"
+        recurse: yes
+
+    - name: Create data directory for patroni
+      file:
+        path: "/psql/citti/data"
+        state: directory
+
+    - name: Set ownership of data directory for patroni
+      file:
+        path: "/psql/citti/data"
+        owner: "postgres"
+        group: "postgres"
+        recurse: yes
+
+    - name: Set permissions of data directory for patroni
+      file:
+        path: "/psql/citti/data"
+        mode: "700"
+
+    - name: Create data directory for PG Archive
+      file:
+        path: "/psqlarchive/citti/archive"
+        state: directory
+
+    - name: Set ownership of data directory for PG Archive
+      file:
+        path: "/psqlarchive/citti/archive"
+        owner: "postgres"
+        group: "postgres"
+        recurse: yes
+
+    - name: Set permissions of data directory for PG Archive
+      file:
+        path: "/psqlarchive/citti/archive"
+        mode: "700"
+
+    - name: Create Patroni configuration file
+      file:
+        path: "/etc/patroni/patroni-citti.yml"
+        owner: "root"
+        group: "root"
+        state: touch
+
+    - name: Delete all existing lines in the config file
+      lineinfile:
+        path: "/etc/patroni/patroni-citti.yml"
+        regexp: '.*'
+        state: absent
+
+    - name: Ensure lines are present in Patroni configuration file
+      blockinfile:
+        path: "/etc/patroni/patroni-citti.yml"
+        insertafter: EOF
+        block: |
+          scope: citti
+          namespace: /clusterdev/
+          name: pgnode1
+
+          restapi:
+              listen: 192.168.1.21:8008
+              connect_address: 192.168.1.21:8008
+
+          etcd:
+              hosts: 192.168.1.21:2379,192.168.1.22:2379,192.168.1.23:2379
+          #    host: 192.168.1.21:2379
+
+          bootstrap:
+            dcs:
+              ttl: 30
+              loop_wait: 10
+              retry_timeout: 10
+              maximum_lag_on_failover: 1048576
+              postgresql:
+                use_pg_rewind: true
+                use_slots: true
+                parameters:
+                  password_encryption: scram-sha-256
+                  max_connections: 100
+                  shared_buffers: 512MB
+                  effective_cache_size: 1.5GB
+                  maintenance_work_mem: 128MB
+                  checkpoint_completion_target: 0.9
+                  wal_buffers: 16MB
+                  default_statistics_target: 100
+                  random_page_cost: 1.1
+                  effective_io_concurrency: 200
+                  work_mem: 2621kB
+                  huge_pages: off
+                  min_wal_size: 512MB
+                  max_wal_size: 1GB
+                  max_worker_processes: 2
+                  max_parallel_workers_per_gather: 1
+                  max_parallel_workers: 1
+                  max_parallel_maintenance_workers: 1
+
+            initdb :
+            - auth: scram-sha-256
+            - encoding: UTF8
+            - data-checksums
+
+
+            pg_hba:
+            - host all all 192.168.1.0/24 scram-sha-256
+            - host replication replicator 127.0.0.1/32 scram-sha-256
+            - host replication replicator 192.168.1.21/32 scram-sha-256
+            - host replication replicator 192.168.1.22/32 scram-sha-256
+            - host replication replicator 192.168.1.23/32 scram-sha-256
+
+          postgresql:
+            listen: 192.168.1.21:5432
+            connect_address: 192.168.1.21:5432
+            data_dir: /psql/citti/data/
+            bin_dir: /usr/pgsql-16/bin
+            pgpass: /tmp/pgpass
+            authentication:
+              replication:
+                username: replicator
+                password: replicator
+              superuser:
+                username: postgres
+                password: patroni
+
+            parameters:
+              shared_preload_libraries: 'pg_stat_statements, pg_cron'
+              track_activity_query_size: 2048
+              pg_stat_statements.track: all
+
+            tags:
+              nofailover: false
+              noloadbalance: false
+              clonefrom: false
+              nosync: false
+
+
+
+    - name: Create Patroni service file
+      file:
+        path: "/usr/lib/systemd/system/patroni-citti.service"
+        owner: "root"
+        group: "root"
+        state: touch
+
+#                  archive_command: gzip < %p > {/psqlarchive/citti/archive/%f'.gz'
+#                  archive_mode: true
+#                  restore_command: gunzip < /psqlarchive/citti/archive/%f'.gz' > %p
+
+#    - name: Remove default patroni service file
+#      command: "cp /usr/lib/systemd/system/patroni.service"
+#    - name: Copy file with owner and permissions
+#      ansible.builtin.copy:
+#        src: /usr/lib/systemd/system/patroni.service
+#        dest: /usr/lib/systemd/system/patroni-citti.service
+#        owner: root
+#        group: root
+#        mode: '0644'
+
+    - name: Set permissions of patroni service file
+      file:
+        path: "/usr/lib/systemd/system/patroni-citti.service"
+        mode: "0644"
+
+    - name: Delete all existing lines in the service file
+      lineinfile:
+        path: "/usr/lib/systemd/system/patroni-citti.service"
+        regexp: '.*'
+        state: absent
+
+    - name: Ensure lines are present in Patroni service file
+      blockinfile:
+        path: "/usr/lib/systemd/system/patroni-citti.service"
+        insertafter: EOF
+        block: |
+          # It's not recommended to modify this file in-place, because it will be
+          # overwritten during package upgrades.  It is recommended to use systemd
+          # "dropin" feature;  i.e. create file with suffix .conf under
+          # /etc/systemd/system/patroni.service.d directory overriding the
+          # unit's defaults. You can also use "systemctl edit patroni"
+          # Look at systemd.unit(5) manual page for more info.
+
+          [Unit]
+          Description=Runners to orchestrate a high-availability PostgreSQL
+          After=syslog.target network.target
+
+          [Service]
+          Type=simple
+
+          User=postgres
+          Group=postgres
+
+          # Read in configuration file if it exists, otherwise proceed
+          EnvironmentFile=-/etc/patroni_env.conf
+
+          # WorkingDirectory=/var/lib/pgsql
+
+          # Where to send early-startup messages from the server
+          # This is normally controlled by the global default set by systemd
+          #StandardOutput=syslog
+
+          # Pre-commands to start watchdog device
+          # Uncomment if watchdog is part of your patroni setup
+          #ExecStartPre=-/usr/bin/sudo /sbin/modprobe softdog
+          #ExecStartPre=-/usr/bin/sudo /bin/chown postgres /dev/watchdog
+
+          # Start the patroni process
+          ExecStart=/usr/bin/patroni /etc/patroni/patroni-citti.yml
+
+          # Send HUP to reload from patroni.yml
+          ExecReload=/usr/bin/kill -s HUP $MAINPID
+
+          # only kill the patroni process, not it's children, so it will gracefully stop postgres
+          KillMode=process
+
+          # Give a reasonable amount of time for the server to start up/shut down
+          TimeoutSec=30
+
+          # Do not restart the service if it crashes, we want to manually inspect database on failure
+          Restart=no
+
+          [Install]
+          WantedBy=multi-user.target
+
+#    - name: Remove default patroni service file
+#      command: "rm -rf {{ cleaned_path_service }}/patroni.service"
+
+    - name: Enable patroni service
+      systemd:
+        name: "patroni-citti.service"
+        enabled: yes
+...
