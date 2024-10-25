@@ -8,7 +8,11 @@
   tasks:
 ######## OS SETUP ###########
 
+    - name: Disable PostgreSQL module in DNF configuration
+      command: "dnf -qy module disable postgresql"
 
+    - name: Disable PostgreSQL module in DNF configuration
+      command: "dnf -qy module disable postgresql"
 
     - name: Disable PostgreSQL module in DNF configuration
       command: "dnf -qy module disable postgresql"
@@ -16,13 +20,22 @@
     - name: Install PostgreSQL Repository
       command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
 
+    - name: Install PostgreSQL Repository
+      command: "dnf install -y nc
+      #can skip when already installed
+
     - name: Enable RHEL8 Extras Repository
       command: "dnf config-manager --enable pgdg-rhel8-extras"
 
-#    - name: Install ETCD
-#      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    - name: Open Port For Patroni, ETCD, and HAProxy
+      command: "firewall-cmd --add-port=5432/tcp, 5433/tcp, 5434/tcp, 2379/tcp, 2380/tcp, 8008/tcp --permanent"
+      #Either open spesific port on specific host or we can open on all host0
+
+    - name: Open Port
+      command: "firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent"
 
 
+######## ETCD SETUP ###########
 
 #    - name: Enable PostgreSQL Repository
 #      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
