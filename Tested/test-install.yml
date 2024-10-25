@@ -49,6 +49,11 @@
       command: "firewall-cmd --reload"
       #Either open spesific port on specific host or we can open on all host0
 
+    - name: Restart Chronyd service
+      systemd:
+        name: "chronyd.service"
+        enabled: yes
+        state: restarted
 
 ######## ETCD SETUP ###########
 
