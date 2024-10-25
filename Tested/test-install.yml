@@ -6,6 +6,10 @@
   become_user: root
 
   tasks:
+######## OS SETUP ###########
+
+
+
     - name: Disable PostgreSQL module in DNF configuration
       command: "dnf -qy module disable postgresql"
 
