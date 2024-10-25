@@ -11,13 +11,13 @@
 
     - name: Install PostgreSQL Repository
       command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
-  
+
     - name: Enable RHEL8 Extras Repository
       command: "dnf config-manager --enable pgdg-rhel8-extras"
 
 #    - name: Install ETCD
 #      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
-  
+
 
 
 #    - name: Enable PostgreSQL Repository
@@ -34,7 +34,7 @@
           - postgresql16-contrib
         state: present
         disable_gpg_check: true
-    
+
     - name: Install ETCD
       yum:
         name: etcd
@@ -46,7 +46,7 @@
         name: patroni-etcd
         state: present
         disable_gpg_check: true
-    
+
     - name: Install Patroni
       yum:
         name: patroni-3.2.2
@@ -58,7 +58,7 @@
     #    name: pgbackrest
     #    state: present
     #  tags: pgbackrest
-    
+
     - name: Install Python3 ETCD
       yum:
         name: python3-etcd
@@ -76,22 +76,22 @@
         name: pg_top
         state: present
         disable_gpg_check: true
-    
+
     - name: Install Check Postgres
       yum:
         name: check_postgres
         state: present
         disable_gpg_check: true
-       
+
     - name: Install python3-etcd from RPM
       yum:
         name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
-        state: present 
-        disable_gpg_check: false      
-   
+        state: present
+        disable_gpg_check: false
+
     - name: Run pip install command
       command: python3 -m pip install patroni[etcd]
-    
+
     - name: Create directory for patroni
       file:
         path: "/etc/patroni"
@@ -103,13 +103,13 @@
         owner: "root"
         group: "root"
         recurse: yes
-    
+
     - name: Create data directory for patroni
       file:
         path: "/psql/citti/data"
         state: directory
 
-    - name: Set ownership of data directory for patroni 
+    - name: Set ownership of data directory for patroni
       file:
         path: "/psql/citti/data"
         owner: "postgres"
@@ -126,7 +126,7 @@
         path: "/psqlarchive/citti/archive"
         state: directory
 
-    - name: Set ownership of data directory for PG Archive 
+    - name: Set ownership of data directory for PG Archive
       file:
         path: "/psqlarchive/citti/archive"
         owner: "postgres"
@@ -137,22 +137,22 @@
       file:
         path: "/psqlarchive/citti/archive"
         mode: "700"
-   
+
     - name: Create Patroni configuration file
       file:
         path: "/etc/patroni/patroni-citti.yml"
         owner: "root"
         group: "root"
-        state: touch        
-                  
+        state: touch
+
     - name: Delete all existing lines in the config file
       lineinfile:
-        path: "/etc/patroni/patroni-citti.yml" 
+        path: "/etc/patroni/patroni-citti.yml"
         regexp: '.*'
-        state: absent  
+        state: absent
 
     - name: Ensure lines are present in Patroni configuration file
-      blockinfile: 
+      blockinfile:
         path: "/etc/patroni/patroni-citti.yml"
         insertafter: EOF
         block: |
@@ -202,7 +202,7 @@
             - encoding: UTF8
             - data-checksums
 
-                      
+
             pg_hba:
             - host all all 192.168.1.0/24 scram-sha-256
             - host replication replicator 127.0.0.1/32 scram-sha-256
@@ -223,18 +223,18 @@
               superuser:
                 username: postgres
                 password: patroni
-              
+
             parameters:
               shared_preload_libraries: 'pg_stat_statements, pg_cron'
               track_activity_query_size: 2048
               pg_stat_statements.track: all
-          
+
             tags:
               nofailover: false
               noloadbalance: false
               clonefrom: false
               nosync: false
-    
+
 
 
     - name: Create Patroni service file
@@ -249,7 +249,7 @@
 #                  restore_command: gunzip < /psqlarchive/citti/archive/%f'.gz' > %p
 
 #    - name: Remove default patroni service file
-#      command: "cp /usr/lib/systemd/system/patroni.service" 
+#      command: "cp /usr/lib/systemd/system/patroni.service"
 #    - name: Copy file with owner and permissions
 #      ansible.builtin.copy:
 #        src: /usr/lib/systemd/system/patroni.service
@@ -265,12 +265,12 @@
 
     - name: Delete all existing lines in the service file
       lineinfile:
-        path: "/usr/lib/systemd/system/patroni-citti.service" 
+        path: "/usr/lib/systemd/system/patroni-citti.service"
         regexp: '.*'
         state: absent
-        
+
     - name: Ensure lines are present in Patroni service file
-      blockinfile: 
+      blockinfile:
         path: "/usr/lib/systemd/system/patroni-citti.service"
         insertafter: EOF
         block: |
@@ -324,9 +324,10 @@
           WantedBy=multi-user.target
 
 #    - name: Remove default patroni service file
-#      command: "rm -rf {{ cleaned_path_service }}/patroni.service" 
+#      command: "rm -rf {{ cleaned_path_service }}/patroni.service"
 
     - name: Enable patroni service
       systemd:
         name: "patroni-citti.service"
         enabled: yes
+...
