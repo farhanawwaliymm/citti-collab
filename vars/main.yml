@@ -1,0 +1,12 @@
+---
+package_install:
+  - postgresql16-server
+  - postgresql16
+  - postgresql16-contrib
+  - etcd
+  - patron-etcd
+  - patron
+  - python3-etcd
+  - pg_cron_16
+  - pg_top
+  - check_postgres
