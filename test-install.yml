@@ -39,7 +39,7 @@
       yum:
         name: etcd
         state: present
-        disable_gpg_check: true
+        disable_gpg_check: false
 
     - name: Install Patroni ETCD
       yum:
