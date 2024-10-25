@@ -57,11 +57,46 @@
 
 ######## ETCD SETUP ###########
 
-#    - name: Enable PostgreSQL Repository
-#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-rhel8"
+    - name: Install python3-etcd from RPM
+      yum:
+        name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+        state: present
+        disable_gpg_check: false
 
-#    - name: Enable Pgdg Repository
-#      command: "subscription-manager repos --enable=Infinitium_PostgreSQL15_PostgreSQL15-common-pgdg-rhel8-extras"
+    - name: Install ETCD
+      yum:
+        name: etcd
+        state: present
+        disable_gpg_check: false
+
+    - name: Copy the default config file
+      command: "cp -p /etc/etcd/etcd.conf /etc/etcd/etcd.conf.bak"
+
+    - name: Delete all existing lines in the config file
+      lineinfile:
+        path: "/etc/etcd/etcd.conf"
+        regexp: '.*'
+        state: absent
+
+    - name: Ensure lines are present in Patroni configuration file
+      blockinfile:
+        path: "/etc/etcd/etcd.conf"
+        insertafter: EOF
+        block: |
+          scope: citti
+          namespace: /clusterdev/
+          name: pgnode1
+          ETCD_NAME="etcd1"
+          ETCD_DATA_DIR="/var/lib/etcd"
+          ETCD_LISTEN_CLIENT_URLS="http://192.168.1.21:2379,http://localhost:2379"
+          ETCD_LISTEN_PEER_URLS="http://192.168.1.21:2380,http://localhost:2380"
+          ETCD_ADVERTISE_CLIENT_URLS="http://192.168.1.21:2379"
+          ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.1.21:2380"
+          ETCD_ELECTION_TIMEOUT=5000
+          ETCD_HEARTBEAT_INTERVAL=250
+          ETCD_INITIAL_CLUSTER="etcd1=http://192.168.1.21:2380,etcd2=http://192.168.1.22:2380,etcd3=http://192.168.1.23:2380"
+          ETCD_INITIAL_CLUSTER_STATE="new"
+          ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 
     - name: Install PostgreSQL 16 server, client, and contrib
       yum:
@@ -72,11 +107,6 @@
         state: present
         disable_gpg_check: true
 
-    - name: Install ETCD
-      yum:
-        name: etcd
-        state: present
-        disable_gpg_check: false
 
     - name: Install Patroni ETCD
       yum:
@@ -120,11 +150,7 @@
         state: present
         disable_gpg_check: true
 
-    - name: Install python3-etcd from RPM
-      yum:
-        name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
-        state: present
-        disable_gpg_check: false
+
 
     - name: Run pip install command
       command: python3 -m pip install patroni[etcd]
