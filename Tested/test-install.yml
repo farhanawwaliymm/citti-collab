@@ -115,54 +115,6 @@
         state: present
         disable_gpg_check: true
 
-
-    - name: Install Patroni ETCD
-      yum:
-        name: patroni-etcd
-        state: present
-        disable_gpg_check: true
-
-    - name: Install Patroni
-      yum:
-        name: patroni-3.2.2
-        state: present
-        disable_gpg_check: true
-
-    #- name: Install Pgbackrest
-    #  yum:
-    #    name: pgbackrest
-    #    state: present
-    #  tags: pgbackrest
-
-    - name: Install Python3 ETCD
-      yum:
-        name: python3-etcd
-        state: present
-        disable_gpg_check: true
-
-    - name: Install Pg Cron
-      yum:
-        name: pg_cron_16
-        state: present
-        disable_gpg_check: true
-
-    - name: Install Pg Top
-      yum:
-        name: pg_top
-        state: present
-        disable_gpg_check: true
-
-    - name: Install Check Postgres
-      yum:
-        name: check_postgres
-        state: present
-        disable_gpg_check: true
-
-
-
-    - name: Run pip install command
-      command: python3 -m pip install patroni[etcd]
-
     - name: Create directory for patroni
       file:
         path: "/etc/patroni"
@@ -174,6 +126,15 @@
         owner: "root"
         group: "root"
         recurse: yes
+
+    - name: Install Patroni
+      yum:
+        name: patroni
+        state: present
+        disable_gpg_check: true
+
+    - name: Run pip install command
+      command: python3 -m pip install patroni[etcd]
 
     - name: Create data directory for patroni
       file:
@@ -208,6 +169,41 @@
       file:
         path: "/psqlarchive/citti/archive"
         mode: "700"
+#    - name: Install Patroni
+#      yum:
+#        name: patroni-3.2.2
+#        state: present
+#        disable_gpg_check: true
+
+    #- name: Install Pgbackrest
+    #  yum:
+    #    name: pgbackrest
+    #    state: present
+    #  tags: pgbackrest
+
+#    - name: Install Python3 ETCD
+#      yum:
+#        name: python3-etcd
+#        state: present
+#        disable_gpg_check: true
+
+    - name: Install Pg Cron
+      yum:
+        name: pg_cron_16
+        state: present
+        disable_gpg_check: true
+
+    - name: Install Pg Top
+      yum:
+        name: pg_top
+        state: present
+        disable_gpg_check: true
+
+    - name: Install Check Postgres
+      yum:
+        name: check_postgres
+        state: present
+        disable_gpg_check: true
 
     - name: Create Patroni configuration file
       file:
@@ -315,20 +311,6 @@
         group: "root"
         state: touch
 
-#                  archive_command: gzip < %p > {/psqlarchive/citti/archive/%f'.gz'
-#                  archive_mode: true
-#                  restore_command: gunzip < /psqlarchive/citti/archive/%f'.gz' > %p
-
-#    - name: Remove default patroni service file
-#      command: "cp /usr/lib/systemd/system/patroni.service"
-#    - name: Copy file with owner and permissions
-#      ansible.builtin.copy:
-#        src: /usr/lib/systemd/system/patroni.service
-#        dest: /usr/lib/systemd/system/patroni-citti.service
-#        owner: root
-#        group: root
-#        mode: '0644'
-
     - name: Set permissions of patroni service file
       file:
         path: "/usr/lib/systemd/system/patroni-citti.service"
@@ -401,4 +383,18 @@
       systemd:
         name: "patroni-citti.service"
         enabled: yes
+        state: started
+#                  archive_command: gzip < %p > {/psqlarchive/citti/archive/%f'.gz'
+#                  archive_mode: true
+#                  restore_command: gunzip < /psqlarchive/citti/archive/%f'.gz' > %p
+
+#    - name: Remove default patroni service file
+#      command: "cp /usr/lib/systemd/system/patroni.service"
+#    - name: Copy file with owner and permissions
+#      ansible.builtin.copy:
+#        src: /usr/lib/systemd/system/patroni.service
+#        dest: /usr/lib/systemd/system/patroni-citti.service
+#        owner: root
+#        group: root
+#        mode: '0644'
 ...
