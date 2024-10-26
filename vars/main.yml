@@ -13,3 +13,10 @@ package_install:
 postgresql_repo: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
 pgdg_repo_extra: pgdg-rhel8-extras
 python3_etcd_package: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+patroni_pip_etcd: patroni[etcd]
+patroni_directory: /etc/patroni
+patroni_data_directory: /psql/citti/data
+patroni_pg_archive_directory: /psqlarchive/citti/archive
+patroni_config_file_yml: /etc/patroni/patroni-citti.yml
+patroni_service_file: /usr/lib/systemd/system/patroni-citti.service
+patroni_service: patroni-citti.service
