@@ -7,8 +7,80 @@
 
   tasks:
 ######## OS SETUP ###########
+    - name: Enable Firewalld service
+      ansible.builtin.systemd_service:
+        name: "{{ firewalld_service }}"
+        enabled: yes
+        state: started
+      register: enable_firewalld_service
 
-######## install stage ########
+    - name: open port for Patroni, ETCD, HA-Proxy
+      ansible.posix.firewalld:
+        port: "{{ port_firewalld }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      register: open_port_firewalld
+
+    - name: Restart firewalld service
+      ansible.builtin.systemd_service:
+        name: "{{ firewalld_service }}"
+        enabled: true
+        state: restarted
+      register: restart_firewalld
+
+    - name: Restart Chronyd service
+      ansible.builtin.systemd_service:
+        name: "{{ chrony_service }}"
+        enabled: yes
+        state: restarted
+      register: restart_chronyd
+
+######## install patroni ########
+    - name: install python3-etcd from RPM
+      ansible.builtin.dnf:
+        name: "{{ python3_etcd_package }}"
+        state: present
+        disable_gpg_check: true
+      register: install_python3_etcd_rpm
+
+    - name: install needed package
+      ansible.builtin.dnf:
+        name: "{{ package_install }}"
+        state: present
+        disable_gpg_check: true
+      register: installed_needed_package
+
+    - name: Copy default config file
+      ansible.builtin.copy:
+        src: "{{ etcd_config_file }}"
+        dest: "{{ etcd_config_file }}.bak"
+        remote_src: true
+        backup: true
+      register: copy_default_config_etcd
+
+    - name: Delete all existing lines in the config file
+      ansible.builtin.lineinfile:
+        path: "{{ etcd_config_file }}"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_etcdconf
+
+    - name: Ensure lines are present in Patroni configuration file
+      ansible.builtin.template:
+        src: "template/etcd.conf.j2"
+        dest: "{{ etcd_config_file }}"
+        backup: true
+      register: config_etcdconf
+
+    - name: Restart ETCD service
+      ansible.builtin.systemd_service:
+        name: "{{ etcd_service }}"
+        enabled: yes
+        state: started
+      register: restart_service_etcd
+
+######## install patroni ########
     - name: Disable PostgreSQL module in DNF configuration
       ansible.builtin.command: "dnf -qy module disable postgresql"
       register: disable_postgre_module_dnf
@@ -26,18 +98,11 @@
       register: enabled-pgdg-repo
 
     - name: install needed package
-      ansible.biltin.dnf:
+      ansible.builtin.dnf:
         name: "{{ package_install }}"
         state: present
         disable_gpg_check: true
       register: installed_needed_package
-
-    - name: install python3-etcd from RPM
-      ansible.builtin.dnf:
-        name: "{{ python3_etcd_package }}"
-        state: present
-        disable_gpg_check: true
-      register: install_python3-etcd_rpm
 
     - name: Run pip install to install patroni etcd
       ansible.builtin.pip:
@@ -87,6 +152,7 @@
         path: "{{ patroni_config_file_yml }}"
         regexp: '.*'
         state: absent
+      register: delete_existingline_patroniconf
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
@@ -94,6 +160,8 @@
         dest: "{{ patroni_config_file_yml }}"
         owner: root
         group: root
+        mode: "0644"
+      register: config_patroniconf
 
     - name: Create Patroni service file
       ansible.builtin.file:
@@ -102,12 +170,14 @@
         group: "root"
         mode: "0644"
         state: touch
+      register: patroni_servicefile
 
     - name: Delete all existing lines in the service file
       ansible.builtin.lineinfile:
         path: "{{ patroni_service_file }}"
         regexp: '.*'
         state: absent
+      register: patroni_servicefile_clean
 
     - name: Ensure lines are present in Patroni service file
       ansible.builtin.template:
@@ -116,9 +186,12 @@
         owner: "root"
         group: "root"
         mode: "0644"
+      register: config_patroni_service
 
     - name: Enable patroni service
-      systemd:
+      ansible.builtin.systemd_service:
         name: "{{ patroni_service }}"
         enabled: yes
+        state: started
+      register: start_patroni_service
 ...
