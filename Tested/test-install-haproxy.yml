@@ -1,1 +1,46 @@
-test
+######## HAPROXY SETUP ###########
+
+    - name: Install python3-etcd from RPM
+      yum:
+        name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
+        state: present
+        disable_gpg_check: false
+
+    - name: Install ETCD
+      yum:
+        name: haproxy
+        state: present
+        disable_gpg_check: false
+
+    - name: Copy the default config file
+      command: "cp -p /etc/haproxy/haproxy.conf /etc/haproxy/haproxy.conf.bak"
+
+    - name: Delete all existing lines in the config file
+      lineinfile:
+        path: "/etc/etcd/etcd.conf"
+        regexp: '.*'
+        state: absent
+
+    - name: Ensure lines are present in Patroni configuration file
+      blockinfile:
+        path: "/etc/etcd/etcd.conf"
+        insertafter: EOF
+        block: |
+          ETCD_NAME="etcd1"
+          ETCD_DATA_DIR="/var/lib/etcd"
+          ETCD_LISTEN_CLIENT_URLS="http://192.168.1.21:2379,http://localhost:2379"
+          ETCD_LISTEN_PEER_URLS="http://192.168.1.21:2380,http://localhost:2380"
+          ETCD_ADVERTISE_CLIENT_URLS="http://192.168.1.21:2379"
+          ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.1.21:2380"
+          ETCD_ELECTION_TIMEOUT=5000
+          ETCD_HEARTBEAT_INTERVAL=250
+          ETCD_INITIAL_CLUSTER="etcd1=http://192.168.1.21:2380,etcd2=http://192.168.1.22:2380,etcd3=http://192.168.1.23:2380"
+          ETCD_INITIAL_CLUSTER_STATE="new"
+          ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+          ETCD_ENABLE_V2="true"
+
+    - name: Restart ETCD service
+      systemd:
+        name: "etcd.service"
+        enabled: yes
+        state: started
