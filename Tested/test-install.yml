@@ -41,8 +41,8 @@
       command: "firewall-cmd --add-port=5432/tcp --add-port=5433/tcp --add-port=5434/tcp --add-port=2379/tcp --add-port=2380/tcp --add-port=8008/tcp --permanent"
       #Either open spesific port on specific host or we can open on all host0
 
-#    - name: Open Port
-#      command: "firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent"
+    - name: Open Port
+      command: "firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent"
        #how can we add this for Keepalived only
 #
     - name: Reload Firewall-cmd service
