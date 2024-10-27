@@ -17,12 +17,14 @@
       ansible.builtin.dnf:
         name: "{{ postgresql_repo }}"
         state: present
+        disable_gpg_check: true
       register: install_postgre_repo
 
     - name: Enable RHEL8 Extras Repository
       ansible.builtin.dnf:
         enablerepo: "{{ pgdg_extra_repo }}"
         state: present
+        disable_gpg_check: true
       register: enabled-pgdg-repo
 
     - name: install needed package
