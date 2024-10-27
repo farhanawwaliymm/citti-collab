@@ -61,6 +61,9 @@
     - name: Enable selinux for haproxy
       raw: "semodule -i my-keepalived.pp"      
 
+    - name: Open Port VRRP
+      raw: firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent
+       #how can we add this for Keepalived only
 
     - name: Restart Chronyd service
       systemd:
