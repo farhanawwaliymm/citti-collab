@@ -51,7 +51,10 @@
 
     - name: Enable selinux for haproxy
       command: "setsebool -P haproxy_connect_any=1"
-
+    - name: Enable selinux for haproxy
+      command: "ausearch -c 'keepalived' --raw | audit2allow -M my-keepalived"
+    - name: Enable selinux for haproxy
+      command: "semodule -i my-keepalived.pp"      
 
     - name: Restart Chronyd service
       systemd:
