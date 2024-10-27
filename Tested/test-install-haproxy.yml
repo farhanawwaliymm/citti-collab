@@ -52,9 +52,9 @@
     - name: Enable selinux for haproxy
       command: "setsebool -P haproxy_connect_any=1"
     - name: Enable selinux for haproxy
-      command: ausearch -c haproxy --raw | audit2allow -M my-haproxy
+      raw: ausearch -c haproxy --raw | audit2allow -M my-haproxy
     - name: Enable selinux for haproxy
-      command: "semodule -i my-haproxy.pp"      
+      raw: "semodule -i my-haproxy.pp"      
 
 #    - name: Enable selinux for haproxy
 #      command: "ausearch -c 'keepalived' --raw | audit2allow -M my-keepalived"
