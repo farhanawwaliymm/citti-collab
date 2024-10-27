@@ -21,6 +21,7 @@
       ansible.posix.firewalld:
         port: "{{ port_firewalld }}"
         permanent: true
+        state: present
         immediate: true
       ignore_errors: true
       register: open_port_firewalld
@@ -81,7 +82,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: "templates/etcd.conf.j2"
+        src: ../templates/etcd.conf.j2
         dest: "{{ etcd_config_file }}"
         backup: true
       register: config_etcdconf
@@ -170,7 +171,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: templates/patroni.yml.j2
+        src: ../templates/patroni.yml.j2
         dest: "{{ patroni_config_file_yml }}"
         owner: root
         group: root
@@ -195,7 +196,7 @@
 
     - name: Ensure lines are present in Patroni service file
       ansible.builtin.template:
-        src: templates/patroni_service.j2
+        src: ../templates/patroni_service.j2
         dest: "{{ patroni_service_file }}"
         owner: "root"
         group: "root"

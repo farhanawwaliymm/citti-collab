@@ -107,7 +107,7 @@
 
     - name: Ensure line are present in HAProxy configuration file
       ansible.builtin.template:
-        src: templates/haproxy.cfg.j2
+        src: ../templates/haproxy.cfg.j2
         dest: "{{ haproxy_config_file }}"
       register: haproxy_config
 
@@ -154,7 +154,7 @@
         state: "{{ 'master' if ansible_host == 192.168.1.24 else 'backup' }}"
         iface_used: "{{ iface | default('test') }}"
       ansible.builtin.template:
-        src: templates/keepalived.conf.j2
+        src: ../templates/keepalived.conf.j2
         dest: "{{ keepalived_config_file }}"
       register: config_keepalived_conf
 
