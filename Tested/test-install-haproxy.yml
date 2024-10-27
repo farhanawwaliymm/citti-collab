@@ -186,7 +186,7 @@
           
           vrrp_instance VI_1 {
               state MASTER
-              interface enp0s3
+              interface enp0s3 #Based on interface name. This interface name will depends on which interface that used to be accessed by apps. We will create virtual IP on this interface
               virtual_router_id 51
               priority 101
               advert_int 1
