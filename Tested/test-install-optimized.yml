@@ -20,9 +20,9 @@
         disable_gpg_check: true
       register: install_postgre_repo
 
-    - name: Enable RHEL8 Extras Repository
-      command: "dnf config-manager --enable pgdg-rhel8-extras"
-      register: enable_extra_repo
+    # - name: Enable RHEL8 Extras Repository
+    #   command: "dnf config-manager --enable pgdg-rhel8-extras"
+    #   register: enable_extra_repo
 
     - name: Enable RHEL8 Extras Repository
       ansible.builtin.yum_repository:
