@@ -97,6 +97,7 @@
           ETCD_INITIAL_CLUSTER="etcd1=http://192.168.1.21:2380,etcd2=http://192.168.1.22:2380,etcd3=http://192.168.1.23:2380"
           ETCD_INITIAL_CLUSTER_STATE="new"
           ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+          ETCD_ENABLE_V2="true"
 
     - name: Restart ETCD service
       systemd:
