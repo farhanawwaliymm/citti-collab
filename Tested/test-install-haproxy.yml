@@ -68,17 +68,17 @@
         disable_gpg_check: false
 
     - name: Copy the default config file
-      command: "cp -p /etc/haproxy/haproxy.conf /etc/haproxy/haproxy.conf.bak"
+      command: "cp -p /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak"
 
     - name: Delete all existing lines in the config file
       lineinfile:
-        path: "/etc/haproxy/haproxy.conf"
+        path: "/etc/haproxy/haproxy.cfg"
         regexp: '.*'
         state: absent
 
     - name: Ensure lines are present in Haproxy configuration file
       blockinfile:
-        path: "/etc/haproxy/haproxy.conf"
+        path: "/etc/haproxy/haproxy.cfg"
         insertafter: EOF
         block: |
           global
