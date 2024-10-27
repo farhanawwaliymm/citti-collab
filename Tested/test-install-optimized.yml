@@ -91,6 +91,7 @@
         name: "{{ etcd_service }}"
         enabled: yes
         state: started
+      ignore_errors: true
       register: restart_service_etcd
 
 ######## install patroni ########
