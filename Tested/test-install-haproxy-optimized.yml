@@ -21,7 +21,6 @@
       ansible.posix.firewalld:
         port: "{{ port_firewalld }}"
         permanent: true
-        state: enabled
         immediate: true
       ignore_errors: true
       register: open_port_firewalld
@@ -35,7 +34,7 @@
       register: firewalld_rule_rich
 
     - name: Enable SELinux boolean for HAProxy to connect
-      ansible.builtin.selinux:
+      ansible.posix.seboolean:
         name: haproxy_connect_any=1
         state: true
         persistent: yes
