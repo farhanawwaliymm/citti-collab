@@ -13,6 +13,7 @@
         name: "{{ firewalld_service }}"
         enabled: yes
         state: started
+      ignore_errors: true
       register: enable_firewalld_service
 
     - name: open port for Patroni, ETCD, HA-Proxy
