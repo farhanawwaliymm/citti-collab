@@ -7,6 +7,7 @@ port_firewalld:
   - 2380/tcp
   - 8008/tcp
 firewalld_service: firewalld.service
+firewalld_rich_rule: rule protocol value="vrrp" accept
 chrony_service: chronyd.service
 etcd_config_file: /etc/etcd/etcd.conf
 etcd_service: etcd.service

@@ -25,6 +25,14 @@
       ignore_errors: true
       register: open_port_firewalld
 
+    - name: add rich rule for vrrp
+      ansible.posix.firewalld:
+        rich_rule: "{{ firewalld_rich_rule }}"
+        permanent: true
+        state: present
+      ignore_errors: true
+      register: firewalld_rule_rich
+
     - name: Restart firewalld service
       ansible.builtin.systemd_service:
         name: "{{ firewalld_service }}"
