@@ -1,0 +1,15 @@
+{% if dcs == 'consul' %}
+# We depend on a local patroni client
+consul:
+  host: "127.0.0.1:{{ dcs_port[dcs] }}"
+{% endif
+ %}
+{% if dcs == 'zookeeper' or dcs == 'etcd' or dcs == 'etcd3' %}
+{{ dcs }}:
+  hosts:
+{%   for ip in dcs_ips
+ %}
+    - {{ ip }}:{{ dcs_port[dcs] }}
+{%
+     endfor %}
+{% endif %}
