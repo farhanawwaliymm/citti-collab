@@ -8,30 +8,46 @@
   tasks:
 ######## OS SETUP ###########
 
+#    - name: Disable PostgreSQL module in DNF configuration
+#      command: "dnf -qy module disable postgresql"
+
+#    - name: Disable PostgreSQL module in DNF configuration
+#      command: "dnf -qy module disable postgresql"
+
+    - name: Disable PostgreSQL module in DNF configuration
+      command: "dnf -qy module disable postgresql"
+
+    - name: Install PostgreSQL Repository
+      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+
+    - name: Install NC Package
+      command: "dnf install -y nc"
+     #can skip when already installed
+
+    - name: Install Telnet Package
+      command: "dnf install -y telnet"
+     #can skip when already installed
+
+    - name: Enable RHEL8 Extras Repository
+      command: "dnf config-manager --enable pgdg-rhel8-extras"
+
     - name: Enable Firewalld service
-      ansible.builtin.systemd_service:
-        name: "{{ firewalld_service }}"
+      systemd:
+        name: "firewalld.service"
         enabled: yes
         state: started
-      ignore_errors: true
-      register: enable_firewalld_service
 
-    - name: open port for Patroni, ETCD, HA-Proxy
-      ansible.posix.firewalld:
-        port: "{{ port_firewalld }}"
-        permanent: true
-        state: enabled
-        immediate: true
-      ignore_errors: true
-      register: open_port_firewalld
+    - name: Open Port For Patroni, ETCD, and HAProxy
+      command: "firewall-cmd --add-port=5432/tcp --add-port=5433/tcp --add-port=9000/tcp --add-port=5434/tcp --add-port=2379/tcp --add-port=2380/tcp --add-port=8008/tcp --permanent"
+      #Either open spesific port on specific host or we can open on all host0
 
-    - name: add rich rule for vrrp
-      ansible.posix.firewalld:
-        rich_rule: "{{ firewalld_rich_rule }}"
-        permanent: true
-        state: present
-      ignore_errors: true
-      register: firewalld_rule_rich
+#    - name: Open Port
+#      command: "firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent"
+       #how can we add this for Keepalived only
+#
+    - name: Reload Firewall-cmd service
+      command: "firewall-cmd --reload"
+      #Either open spesific port on specific host or we can open on all host0
 
     - name: Enable selinux for haproxy
       command: "setsebool -P haproxy_connect_any=1"
@@ -45,13 +61,9 @@
     - name: Enable selinux for haproxy
       raw: "semodule -i my-keepalived.pp"
 
-    - name: Restart firewalld service
-      ansible.builtin.systemd_service:
-        name: "{{ firewalld_service }}"
-        enabled: true
-        state: restarted
-      ignore_errors: true
-      register: restart_firewalld
+    - name: Open Port VRRP
+      raw: firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent
+       #how can we add this for Keepalived only
 
     - name: Restart Chronyd service
       systemd:
