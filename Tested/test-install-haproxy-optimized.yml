@@ -36,7 +36,7 @@
 
     - name: Enable SELinux boolean for HAProxy to connect
       ansible.posix.seboolean:
-        name: haproxy_connect_any=1
+        name: haproxy_connect_any
         state: true
         persistent: yes
       register: selinux_boolean_haproxy
