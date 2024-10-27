@@ -144,7 +144,7 @@
 
 ######## KEEPALIVED SETUP ###########
 
-    - name: Install KEEPALIVED
+    - name: Install Keepalived
       yum:
         name: keepalived
         state: present
@@ -159,7 +159,7 @@
         regexp: '.*'
         state: absent
 
-    - name: Ensure lines are present in Haproxy configuration file
+    - name: Ensure lines are present in Keepalived configuration file
       blockinfile:
         path: "/etc/keepalived/keepalived.conf"
         insertafter: EOF
