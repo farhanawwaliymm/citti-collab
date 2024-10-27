@@ -1,12 +1,63 @@
+---
+- name: Install and Config Patroni
+  hosts: all
+  gather_facts: true  # Disable gathering facts to speed up the test
+  become: yes
+  become_user: root
+
+  tasks:
+######## OS SETUP ###########
+
+#    - name: Disable PostgreSQL module in DNF configuration
+#      command: "dnf -qy module disable postgresql"
+
+#    - name: Disable PostgreSQL module in DNF configuration
+#      command: "dnf -qy module disable postgresql"
+
+    - name: Disable PostgreSQL module in DNF configuration
+      command: "dnf -qy module disable postgresql"
+
+    - name: Install PostgreSQL Repository
+      command: "dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+
+    - name: Install NC Package
+      command: "dnf install -y nc"
+     #can skip when already installed
+
+    - name: Install Telnet Package
+      command: "dnf install -y telnet"
+     #can skip when already installed     
+
+    - name: Enable RHEL8 Extras Repository
+      command: "dnf config-manager --enable pgdg-rhel8-extras"
+
+    - name: Enable Firewalld service
+      systemd:
+        name: "firewalld.service"
+        enabled: yes
+        state: started
+
+    - name: Open Port For Patroni, ETCD, and HAProxy
+      command: "firewall-cmd --add-port=5432/tcp --add-port=5433/tcp --add-port=5434/tcp --add-port=2379/tcp --add-port=2380/tcp --add-port=8008/tcp --permanent"
+      #Either open spesific port on specific host or we can open on all host0
+
+    - name: Open Port
+      command: "firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent"
+       #how can we add this for Keepalived only
+#
+    - name: Reload Firewall-cmd service
+      command: "firewall-cmd --reload"
+      #Either open spesific port on specific host or we can open on all host0
+
+    - name: Restart Chronyd service
+      systemd:
+        name: "chronyd.service"
+        enabled: yes
+        state: restarted
+
 ######## HAPROXY SETUP ###########
 
-    - name: Install python3-etcd from RPM
-      yum:
-        name: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-8-x86_64/python3-etcd-0.4.5-43.rhel8.noarch.rpm"
-        state: present
-        disable_gpg_check: false
-
-    - name: Install ETCD
+    - name: Install HAPROXY
       yum:
         name: haproxy
         state: present
@@ -17,30 +68,63 @@
 
     - name: Delete all existing lines in the config file
       lineinfile:
-        path: "/etc/etcd/etcd.conf"
+        path: "/etc/haproxy/haproxy.conf"
         regexp: '.*'
         state: absent
 
-    - name: Ensure lines are present in Patroni configuration file
+    - name: Ensure lines are present in Haproxy configuration file
       blockinfile:
-        path: "/etc/etcd/etcd.conf"
+        path: "/etc/haproxy/haproxy.conf"
         insertafter: EOF
         block: |
-          ETCD_NAME="etcd1"
-          ETCD_DATA_DIR="/var/lib/etcd"
-          ETCD_LISTEN_CLIENT_URLS="http://192.168.1.21:2379,http://localhost:2379"
-          ETCD_LISTEN_PEER_URLS="http://192.168.1.21:2380,http://localhost:2380"
-          ETCD_ADVERTISE_CLIENT_URLS="http://192.168.1.21:2379"
-          ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.1.21:2380"
-          ETCD_ELECTION_TIMEOUT=5000
-          ETCD_HEARTBEAT_INTERVAL=250
-          ETCD_INITIAL_CLUSTER="etcd1=http://192.168.1.21:2380,etcd2=http://192.168.1.22:2380,etcd3=http://192.168.1.23:2380"
-          ETCD_INITIAL_CLUSTER_STATE="new"
-          ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
-          ETCD_ENABLE_V2="true"
+          global
+          log         127.0.0.1 local2
 
-    - name: Restart ETCD service
+          chroot      /var/lib/haproxy
+          pidfile     /var/run/haproxy.pid
+          user        haproxy
+          group       haproxy
+          daemon
+      
+          stats socket /var/lib/haproxy/stats
+          
+          defaults
+              mode                    tcp
+              log                     global
+              retries                 1
+              timeout queue           1m
+              timeout connect         10s
+              timeout client          1m
+              timeout server          1m
+              timeout check           10s
+              maxconn                 300
+          
+          listen stats
+              mode http
+              bind *:9000
+              stats enable
+              stats uri /
+          
+          listen cluster-dev
+              bind *:5432
+              option httpchk
+              http-check expect status 200
+              default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+              server pgnode1 192.168.1.21:5432 maxconn 100 check port 8008
+              server pgnode2 192.168.1.22:5432 maxconn 100 check port 8008
+              server pgnode3 192.168.1.23:5432 maxconn 100 check port 8008
+          listen readonly_cluster-dev
+              bind *:5433
+              option httpchk
+              http-check expect status 503
+              default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+              server pgnode1 192.168.1.21:5432 maxconn 100 check port 8008
+              server pgnode2 192.168.1.22:5432 maxconn 100 check port 8008
+              server pgnode3 192.168.1.23:5432 maxconn 100 check port 8008
+    
+    
+    - name: Restart HAPROXY service
       systemd:
-        name: "etcd.service"
+        name: "haproxy.service"
         enabled: yes
         state: started
