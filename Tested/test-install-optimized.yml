@@ -25,7 +25,7 @@
         enablerepo: "{{ pgdg_repo_extra }}"
         state: present
         disable_gpg_check: true
-      register: enabled-pgdg-repo
+      register: enabled_pgdg_repo
 
     - name: install needed package
       ansible.builtin.dnf:
