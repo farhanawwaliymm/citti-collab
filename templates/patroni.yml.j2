@@ -1,6 +1,6 @@
 scope: citti
 namespace: /clusterdev/
-name: pgnode1
+name: pgnode1 #This value will depends on Patroni node hostname. There are 3 Patroni nodes. pgnode1, pgnode2, and pgnode3.
 
 restapi:
   listen: "{{ ansible_host }}:8008"
