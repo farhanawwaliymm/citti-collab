@@ -22,6 +22,7 @@
         permanent: true
         state: enabled
         immediate: true
+      ignore_errors: true
       register: open_port_firewalld
 
     - name: Restart firewalld service
@@ -29,6 +30,7 @@
         name: "{{ firewalld_service }}"
         enabled: true
         state: restarted
+      ignore_errors: true
       register: restart_firewalld
 
     - name: Restart Chronyd service
@@ -36,6 +38,7 @@
         name: "{{ chrony_service }}"
         enabled: yes
         state: restarted
+      ignore_errors: true
       register: restart_chronyd
 
 ######## install patroni ########
