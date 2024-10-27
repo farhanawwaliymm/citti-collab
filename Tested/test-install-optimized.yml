@@ -22,7 +22,7 @@
 
     - name: Enable RHEL8 Extras Repository
       ansible.builtin.dnf:
-        enablerepo: "{{ pgdg_extra_repo }}"
+        enablerepo: "{{ pgdg_repo_extra }}"
         state: present
         disable_gpg_check: true
       register: enabled-pgdg-repo
