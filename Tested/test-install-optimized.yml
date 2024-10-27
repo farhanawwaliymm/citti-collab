@@ -81,7 +81,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: "template/etcd.conf.j2"
+        src: "templates/etcd.conf.j2"
         dest: "{{ etcd_config_file }}"
         backup: true
       register: config_etcdconf
@@ -170,7 +170,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: template/patroni.yml.j2
+        src: templates/patroni.yml.j2
         dest: "{{ patroni_config_file_yml }}"
         owner: root
         group: root
@@ -195,7 +195,7 @@
 
     - name: Ensure lines are present in Patroni service file
       ansible.builtin.template:
-        src: template/patroni_service.j2
+        src: templates/patroni_service.j2
         dest: "{{ patroni_service_file }}"
         owner: "root"
         group: "root"
