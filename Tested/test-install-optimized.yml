@@ -25,11 +25,10 @@
       register: enable_extra_repo
 
     - name: Enable RHEL8 Extras Repository
-      ansible.builtin.dnf:
-        name: etcd
-        enablerepo: "{{ pgdg_repo_extra }}"
+      ansible.builtin.yum_repository:
+        name: "{{ pgdg_repo_extra }}"
         state: present
-        disable_gpg_check: true
+        gpgcheck: false
       register: enabled_pgdg_repo
 
     - name: install python3-etcd from RPM
