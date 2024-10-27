@@ -56,10 +56,10 @@
     - name: Enable selinux for haproxy
       raw: "semodule -i my-haproxy.pp"      
 
-#    - name: Enable selinux for haproxy
-#      command: "ausearch -c 'keepalived' --raw | audit2allow -M my-keepalived"
-#    - name: Enable selinux for haproxy
-#      command: "semodule -i my-keepalived.pp"      
+    - name: Enable selinux for haproxy
+      raw: ausearch -c keepalived --raw | audit2allow -M my-keepalived
+    - name: Enable selinux for haproxy
+      raw: "semodule -i my-keepalived.pp"      
 
 
     - name: Restart Chronyd service
