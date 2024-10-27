@@ -42,25 +42,25 @@
       register: selinux_boolean_haproxy
 
     - name: Generate SELinux policy module for HAProxy
-      ansible.builtin.command: "ausearch -c haproxy --raw | audit2allow -M my-haproxy"
+      ansible.builtin.shell: "ausearch -c haproxy --raw | audit2allow -M my-haproxy"
       args:
         creates: "my-haproxy.pp"
       register: selinux_haproxy_policy_module
 
     - name: Apply the generated SELinux policy module for haproxy
-      ansible.builtin.command: "semodule -i my-haproxy.pp"
+      ansible.builtin.shell: "semodule -i my-haproxy.pp"
       args:
         removes: "my-haproxy.pp"
       register: selinux_haproxy_policy_install
 
     - name: Generate SELinux policy module for keepalived
-      ansible.builtin.command: "ausearch -c keepalived --raw | audit2allow -M my-keepalived"
+      ansible.builtin.shell: "ausearch -c keepalived --raw | audit2allow -M my-keepalived"
       args:
         creates: "my-keepalived.pp"
       register: selinux_keepalived_policy_module
 
     - name: Apply the generated SELinux policy module for keepalived
-      ansible.builtin.command: "semodule -i my-keepalived.pp"
+      ansible.builtin.shell: "semodule -i my-keepalived.pp"
       args:
         removes: "my-keepalived.pp"
       register: selinux_keepalived_policy_install
