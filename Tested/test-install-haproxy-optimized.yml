@@ -38,7 +38,7 @@
       ansible.posix.seboolean:
         name: haproxy_connect_any
         state: true
-        persistent: yes
+        persistent: true
       register: selinux_boolean_haproxy
 
     - name: Generate SELinux policy module for HAProxy
@@ -87,7 +87,6 @@
       ansible.builtin.dnf:
         name: haproxy
         state: present
-        enabled: true
         disable_gpg_check: false
       register: install_haproxy
 
