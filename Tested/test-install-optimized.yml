@@ -70,6 +70,9 @@
       ignore_errors: true
       register: open_port_firewalld
 
+    - debug:
+        var: open_port_firewalld
+
     - name: add rich rule for vrrp
       ansible.posix.firewalld:
         rich_rule: "{{ firewalld_rich_rule }}"
