@@ -4,6 +4,7 @@
   gather_facts: true
   become: yes
   become_user: root
+  vars_files: vars/main.yml
 
   tasks:
 ######## OS SETUP ###########
