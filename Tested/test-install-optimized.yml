@@ -27,6 +27,13 @@
         disable_gpg_check: true
       register: enabled_pgdg_repo
 
+    - name: install python3-etcd from RPM
+      ansible.builtin.dnf:
+        name: "{{ python3_etcd_package }}"
+        state: present
+        disable_gpg_check: true
+      register: install_python3_etcd_rpm
+
     - name: install needed package
       ansible.builtin.dnf:
         name: "{{ package_install }}"
@@ -39,13 +46,6 @@
         name: "{{ patroni_pip_etcd }}"
         state: present
       register: pip_install_patroni_etcd
-
-    - name: install python3-etcd from RPM
-      ansible.builtin.dnf:
-        name: "{{ python3_etcd_package }}"
-        state: present
-        disable_gpg_check: true
-      register: install_python3_etcd_rpm
 
     - name: Enable Firewalld service
       ansible.builtin.systemd_service:
