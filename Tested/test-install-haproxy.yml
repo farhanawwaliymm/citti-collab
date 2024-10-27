@@ -49,6 +49,10 @@
       command: "firewall-cmd --reload"
       #Either open spesific port on specific host or we can open on all host0
 
+    - name: Enable selinux for haproxy
+      command: "setsebool -P haproxy_connect_any=1"
+
+
     - name: Restart Chronyd service
       systemd:
         name: "chronyd.service"
