@@ -185,7 +185,7 @@
           }
           
           vrrp_instance VI_1 {
-              state MASTER
+              state MASTER #Haproxy1 will have state MASTER and Haproxy2 will have state STANDBY.
               interface enp0s3 #Based on interface name. This interface name will depends on which interface that used to be accessed by apps. We will create virtual IP on this interface. For example, when you check with command ip addr, you can see which interface that use IP that accessed by ansible. In this case, IP 192.168.1.24 is the host IP that accessed by ansible and have interface name "enp0s3". In client side, it will depends on client host configurations.
               virtual_router_id 51
               priority 101
@@ -196,7 +196,7 @@
               }
           
               virtual_ipaddress {
-                  192.168.1.111 dev enp0s3 
+                  192.168.1.111 dev enp0s3 #This is depends on Virtual IP that will used by Client.
               }
               track_script {
           	 haproxy
