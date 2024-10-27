@@ -9,6 +9,42 @@
 
   tasks:
 ######## OS SETUP ###########
+    - name: Disable PostgreSQL module in DNF configuration
+      ansible.builtin.command: "dnf -qy module disable postgresql"
+      register: disable_postgre_module_dnf
+
+    - name: install PostgreSQL Repository
+      ansible.builtin.dnf:
+        name: "{{ postgresql_repo }}"
+        state: present
+      register: install_postgre_repo
+
+    - name: Enable RHEL8 Extras Repository
+      ansible.builtin.dnf:
+        enablerepo: "{{ pgdg_extra_repo }}"
+        state: present
+      register: enabled-pgdg-repo
+
+    - name: install needed package
+      ansible.builtin.dnf:
+        name: "{{ package_install }}"
+        state: present
+        disable_gpg_check: true
+      register: installed_needed_package
+
+    - name: Run pip install to install patroni etcd
+      ansible.builtin.pip:
+        name: "{{ patroni_pip_etcd }}"
+        state: present
+      register: pip_install_patroni_etcd
+
+    - name: install python3-etcd from RPM
+      ansible.builtin.dnf:
+        name: "{{ python3_etcd_package }}"
+        state: present
+        disable_gpg_check: true
+      register: install_python3_etcd_rpm
+
     - name: Enable Firewalld service
       ansible.builtin.systemd_service:
         name: "{{ firewalld_service }}"
@@ -52,21 +88,6 @@
       ignore_errors: true
       register: restart_chronyd
 
-######## install patroni ########
-    - name: install python3-etcd from RPM
-      ansible.builtin.dnf:
-        name: "{{ python3_etcd_package }}"
-        state: present
-        disable_gpg_check: true
-      register: install_python3_etcd_rpm
-
-    - name: install needed package
-      ansible.builtin.dnf:
-        name: "{{ package_install }}"
-        state: present
-        disable_gpg_check: true
-      register: installed_needed_package
-
     - name: Copy default config file
       ansible.builtin.copy:
         src: "{{ etcd_config_file }}"
@@ -98,34 +119,6 @@
       register: restart_service_etcd
 
 ######## install patroni ########
-    - name: Disable PostgreSQL module in DNF configuration
-      ansible.builtin.command: "dnf -qy module disable postgresql"
-      register: disable_postgre_module_dnf
-
-    - name: install PostgreSQL Repository
-      ansible.builtin.dnf:
-        name: "{{ postgresql_repo }}"
-        state: present
-      register: install_postgre_repo
-
-    - name: Enable RHEL8 Extras Repository
-      ansible.builtin.dnf:
-        enablerepo: "{{ pgdg_extra_repo }}"
-        state: present
-      register: enabled-pgdg-repo
-
-    - name: install needed package
-      ansible.builtin.dnf:
-        name: "{{ package_install }}"
-        state: present
-        disable_gpg_check: true
-      register: installed_needed_package
-
-    - name: Run pip install to install patroni etcd
-      ansible.builtin.pip:
-        name: "{{ patroni_pip_etcd }}"
-        state: present
-      register: pip_install_patroni_etcd
 
 ######## config stage ########
     - name: Ensure Patroni directory is created with correct ownership and permissions
