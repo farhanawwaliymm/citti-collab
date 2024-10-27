@@ -1,0 +1,159 @@
+---
+- name: Install and Config Patroni
+  hosts: all
+  gather_facts: true  # Disable gathering facts to speed up the test
+  become: yes
+  become_user: root
+
+  tasks:
+######## OS SETUP ###########
+
+    - name: Enable Firewalld service
+      ansible.builtin.systemd_service:
+        name: "{{ firewalld_service }}"
+        enabled: yes
+        state: started
+      ignore_errors: true
+      register: enable_firewalld_service
+
+    - name: open port for Patroni, ETCD, HA-Proxy
+      ansible.posix.firewalld:
+        port: "{{ port_firewalld }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      ignore_errors: true
+      register: open_port_firewalld
+
+    - name: add rich rule for vrrp
+      ansible.posix.firewalld:
+        rich_rule: "{{ firewalld_rich_rule }}"
+        permanent: true
+        state: present
+      ignore_errors: true
+      register: firewalld_rule_rich
+
+    - name: Enable SELinux boolean for HAProxy to connect
+      ansible.builtin.selinux:
+        name: haproxy_connect_any=1
+        state: true
+        persistent: yes
+      register: selinux_boolean_haproxy
+
+    - name: Generate SELinux policy module for HAProxy
+      ansible.builtin.command: "ausearch -c haproxy --raw | audit2allow -M my-haproxy"
+      args:
+        creates: "my-haproxy.pp"
+      register: selinux_haproxy_policy_module
+
+    - name: Apply the generated SELinux policy module for haproxy
+      ansible.builtin.command: "semodule -i my-haproxy.pp"
+      args:
+        removes: "my-haproxy.pp"
+      register: selinux_haproxy_policy_install
+
+    - name: Generate SELinux policy module for keepalived
+      ansible.builtin.command: "ausearch -c keepalived --raw | audit2allow -M my-keepalived"
+      args:
+        creates: "my-keepalived.pp"
+      register: selinux_keepalived_policy_module
+
+    - name: Apply the generated SELinux policy module for keepalived
+      ansible.builtin.command: "semodule -i my-keepalived.pp"
+      args:
+        removes: "my-keepalived.pp"
+      register: selinux_keepalived_policy_install
+
+    - name: Restart firewalld service
+      ansible.builtin.systemd_service:
+        name: "{{ firewalld_service }}"
+        enabled: true
+        state: restarted
+      ignore_errors: true
+      register: restart_firewalld
+
+    - name: Restart Chronyd service
+      ansible.builtin.systemd_service:
+        name: "{{ chrony_service }}"
+        enabled: yes
+        state: restarted
+      ignore_errors: true
+      register: restart_chronyd
+
+######## HAPROXY SETUP ###########
+
+    - name: Install HAPROXY
+      ansible.builtin.dnf:
+        name: haproxy
+        state: present
+        enabled: true
+        disable_gpg_check: false
+      register: install_haproxy
+
+    - name: Copy the default config file
+      command: "cp -p /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak"
+
+    - name: copy the default config file
+      ansible.builtin.copy:
+        src: "{{ haproxy_config_file }}"
+        dest: "{{ haproxy_config_file }}.bak"
+        remote_src: true
+        backup: true
+      register: copy_default_config_haproxy
+
+    - name: Delete all existing lines in the config file
+      ansible.builtin.lineinfile:
+        path: "/etc/haproxy/haproxy.cfg"
+        regexp: '.*'
+        state: absent
+      register: clear_default_config_haproxy
+
+    - name: Ensure line are present in HAProxy configuration file
+      ansible.builtin.template:
+        src: templates/haproxy.cfg.j2
+        dest: "{{ haproxy_config_file }}"
+      register: haproxy_config
+
+    - name: Restart HAPROXY service
+      ansible.builtin.systemd_service:
+        name: "{{ haproxy_service }}"
+        enabled: yes
+        state: started
+      register: start_haproxy_service
+
+######## KEEPALIVED SETUP ###########
+
+    - name: Install Keepalived
+      ansible.builtin.dnf:
+        name: keepalived
+        state: present
+        disable_gpg_check: false
+      register: install_keepalived
+
+    - name: Copy the default config file
+      ansible.builtin.copy:
+        src: "{{ keepalived_config_file }}"
+        dest: "{{ keepalived_config_file }}.bak"
+        remote_src: true
+        backup: true
+      register: copy_default_config_keepalived
+
+    - name: Delete all existing lines in the config file
+      ansible.builtin.lineinfile:
+        path: "/etc/keepalived/keepalived.conf"
+        regexp: '.*'
+        state: absent
+      register: clear_default_config_keepalived
+
+    - name: Ensure lines are present in keepalived configuration file
+      ansible.builtin.template:
+        src: templates/keepalived.conf.j2
+        dest: "{{ keepalived_config_file }}"
+      register: config_keepalived_conf
+
+    - name: Restart Keepalived service
+      ansible.builtin.systemd_service:
+        name: "{{ keepalived_service }}"
+        enabled: yes
+        state: started
+      register: restart_keepalived_service

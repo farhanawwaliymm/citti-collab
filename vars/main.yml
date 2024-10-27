@@ -34,3 +34,9 @@ patroni_pg_archive_directory: /psqlarchive/citti/archive
 patroni_config_file_yml: /etc/patroni/patroni-citti.yml
 patroni_service_file: /usr/lib/systemd/system/patroni-citti.service
 patroni_service: patroni-citti.service
+
+haproxy_config_file: /etc/haproxy/haproxy.cfg
+haproxy_service: haproxy.service
+
+keepalived_config_file: /etc/keepalived/keepalived.conf
+keepalived_service: keepalived.service
