@@ -1,4 +1,4 @@
-ETCD_NAME="{% for item in groups['all'] %}{{ 'etcd'loop.index if item == ansible_host }}{% endfor %}"
+ETCD_NAME="{% for item in groups['all'] %}{{ if item == ansible_host }}etcd{{ loop.index }}{{ endif}}{% endfor %}"
 ETCD_DATA_DIR="/var/lib/etcd"
 ETCD_LISTEN_CLIENT_URLS="http://{{ ansible_host }}:2379,http://localhost:2379"
 ETCD_LISTEN_PEER_URLS="http://{{ ansible_host }}:2380,http://localhost:2380"
