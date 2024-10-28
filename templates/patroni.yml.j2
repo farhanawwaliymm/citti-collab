@@ -3,11 +3,11 @@ namespace: /clusterdev/
 name: "{{ ansible_hostname }}" #This value will depends on Patroni node hostname. There are 3 Patroni nodes. pgnode1, pgnode2, and pgnode3.
 
 restapi:
-  listen: "{{ ansible_host }}:8008"
-  connect_address: "{{ ansible_host }}:8008"
+  listen: {{ ansible_host }}:8008
+  connect_address: {{ ansible_host }}:8008
 
 etcd:
-  hosts: "{% for item in groups['all'] %}{{ item }}:2379{{ "," if not loop.last }}{% endfor %}"
+  hosts: {% for item in groups['all'] %}{{ item }}:2379{{ "," if not loop.last }}{% endfor %}
 #    host: 192.168.1.21:2379
 
 bootstrap:
