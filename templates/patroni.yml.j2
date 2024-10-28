@@ -1,14 +1,14 @@
+{%raw%}
 scope: citti
 namespace: /clusterdev/
-name: "{{ ansible_hostname }}" #This value will depends on Patroni node hostname. There are 3 Patroni nodes. pgnode1, pgnode2, and pgnode3.
+name: "{%endraw%}{{ ansible_hostname }}{%raw%}"
 
 restapi:
-    listen: {{ ansible_host }}:8008
-    connect_address: {{ ansible_host }}:8008
+    listen: {%endraw%}{{ ansible_host }}{%raw%}:8008
+    connect_address: {%endraw%}{{ ansible_host }}{%raw%}:8008
 
 etcd:
-    hosts: {% for item in groups['all'] %}{{ item }}:2379{{ "," if not loop.last }}{% endfor %}
-#    host: 192.168.1.21:2379
+    hosts: {%endraw%}{% for item in groups['all'] %}{{ item }}:2379{{ "," if not loop.last }}{% endfor %}{%raw%}
 
 bootstrap:
   dcs:
@@ -54,8 +54,8 @@ bootstrap:
   - host all all 0.0.0.0/0 scram-sha-256
 
   postgresql:
-    listen: {{ ansible_host }}:5432
-    connect_address: {{ ansible_host }}:5432
+    listen: {%endraw%}{{ ansible_host }}{%raw%}:5432
+    connect_address: {%endraw%}{{ ansible_host }}{%raw%}:5432
     data_dir: /psql/citti/data
     bin_dir: /usr/pgsql-16/bin
     pgpass: /tmp/pgpass
