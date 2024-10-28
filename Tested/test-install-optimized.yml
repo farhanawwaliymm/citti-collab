@@ -60,7 +60,7 @@
         name: "{{ firewalld_service }}"
         enabled: yes
         state: started
-      ignore_errors: true
+      # ignore_errors: true
       register: enable_firewalld_service
 
     - name: open port for Patroni, ETCD, HA-Proxy
@@ -72,7 +72,7 @@
         zone: public
       with_items:
         - "{{ port_firewalld }}"
-      ignore_errors: true
+      # ignore_errors: true
       register: open_port_firewalld
 
     - name: add rich rule for vrrp
@@ -80,7 +80,7 @@
         rich_rule: "{{ firewalld_rich_rule }}"
         permanent: true
         state: enabled
-      ignore_errors: true
+      # ignore_errors: true
       register: firewalld_rule_rich
 
     - name: Restart firewalld service
@@ -88,7 +88,7 @@
         name: "{{ firewalld_service }}"
         enabled: true
         state: restarted
-      ignore_errors: true
+      # ignore_errors: true
       register: restart_firewalld
 
     - name: Restart Chronyd service
@@ -96,7 +96,7 @@
         name: "{{ chrony_service }}"
         enabled: yes
         state: restarted
-      ignore_errors: true
+      # ignore_errors: true
       register: restart_chronyd
 
     - name: Copy default config file
@@ -126,7 +126,7 @@
         name: "{{ etcd_service }}"
         enabled: yes
         state: started
-      ignore_errors: true
+      # ignore_errors: true
       register: restart_service_etcd
 
 ######## install patroni ########
