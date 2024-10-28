@@ -59,24 +59,24 @@
       ignore_errors: true
       register: enable_firewalld_service
 
-    # - name: open port for Patroni, ETCD, HA-Proxy
-    #   ansible.posix.firewalld:
-    #     port: "{{ item }}"
-    #     state: enabled
-    #     permanent: true
-    #     immediate: true
-    #     zone: public
-    #   loop:
-    #     - "{{ port_firewalld }}"
-    #   ignore_errors: true
-    #   register: open_port_firewalld
-
-    - name: Open Port For Patroni, ETCD, and HAProxy
-      command: "firewall-cmd --add-port='{{ item|list }}'  --permanent"
-      # ignore_errors: true
+    - name: open port for Patroni, ETCD, HA-Proxy
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        state: enabled
+        permanent: true
+        immediate: true
+        zone: public
       loop:
         - "{{ port_firewalld }}"
+      ignore_errors: true
       register: open_port_firewalld
+
+    # - name: Open Port For Patroni, ETCD, and HAProxy
+    #   command: "firewall-cmd --add-port='{{ item|list }}'  --permanent"
+    #   # ignore_errors: true
+    #   loop:
+    #     - "{{ port_firewalld }}"
+    #   register: open_port_firewalld
 
     - debug:
         var: open_port_firewalld
