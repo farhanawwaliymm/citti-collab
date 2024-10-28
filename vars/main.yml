@@ -16,9 +16,9 @@ package_install:
   - postgresql16
   - postgresql16-contrib
   - etcd
-#  - patroni-etcd
+  - patroni-etcd
   - patroni
-#  - python3-etcd
+  - python3-etcd
   - pg_cron_16
   - pg_top
   - check_postgres
