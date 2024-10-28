@@ -183,6 +183,8 @@
         group: root
         mode: "0644"
       register: config_patroniconf
+      tags:
+        - patroni_config
 
     - name: Create Patroni service file
       ansible.builtin.file:
@@ -192,6 +194,8 @@
         mode: "0644"
         state: touch
       register: patroni_servicefile
+      tags:
+        - patroni_config
 
     - name: Delete all existing lines in the service file
       ansible.builtin.lineinfile:
@@ -199,6 +203,8 @@
         regexp: '.*'
         state: absent
       register: patroni_servicefile_clean
+      tags:
+        - patroni_config
 
     - name: Ensure lines are present in Patroni service file
       ansible.builtin.template:
@@ -208,6 +214,8 @@
         group: "root"
         mode: "0644"
       register: config_patroni_service
+      tags:
+        - patroni_config
 
     - name: Enable patroni service
       ansible.builtin.systemd_service:
@@ -215,4 +223,6 @@
         enabled: yes
         state: started
       register: start_patroni_service
+      tags:
+        - patroni_config
 ...
