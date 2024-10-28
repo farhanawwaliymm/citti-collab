@@ -64,7 +64,7 @@
         port: "{{ item }}"
         state: enabled
         permanent: true
-        immediate: true
+        # immediate: true
         zone: public
       loop:
         - "{{ port_firewalld | list }}"
