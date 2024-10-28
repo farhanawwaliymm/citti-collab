@@ -77,7 +77,7 @@
       ansible.posix.firewalld:
         rich_rule: "{{ firewalld_rich_rule }}"
         permanent: true
-        state: present
+        state: enabled
       ignore_errors: true
       register: firewalld_rule_rich
 
