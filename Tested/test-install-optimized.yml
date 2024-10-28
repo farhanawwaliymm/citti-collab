@@ -68,7 +68,7 @@
         zone: public
       loop:
         - "{{ port_firewalld | list }}"
-      ignore_errors: true
+      # ignore_errors: true
       register: open_port_firewalld
 
     # - name: Open Port For Patroni, ETCD, and HAProxy
