@@ -1,5 +1,3 @@
-namespace: /clusterdev/
-name: "{{ ansible_hostname }}"
 ETCD_NAME="{{ ansible_hostname }}"
 ETCD_DATA_DIR="/var/lib/etcd"
 ETCD_LISTEN_CLIENT_URLS="http://{{ ansible_host }}:2379,http://localhost:2379"
