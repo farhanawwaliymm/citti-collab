@@ -9,6 +9,10 @@
 
   tasks:
 ######## OS SETUP ###########
+    - name: debug hostname
+      ansible.builtin.debug:
+        var: ansible_hostname
+
     - name: Disable PostgreSQL module in DNF configuration
       ansible.builtin.command: "dnf -qy module disable postgresql"
       register: disable_postgre_module_dnf
