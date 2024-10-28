@@ -62,7 +62,7 @@
     - name: open port for Patroni, ETCD, HA-Proxy
       ansible.posix.firewalld:
         port: "{{ item }}/tcp"
-        state: present
+        state: enabled
         permanent: true
         immediate: true
       loop:
@@ -77,7 +77,7 @@
       ansible.posix.firewalld:
         rich_rule: "{{ firewalld_rich_rule }}"
         permanent: true
-        state: enabled
+        state: present
       ignore_errors: true
       register: firewalld_rule_rich
 
