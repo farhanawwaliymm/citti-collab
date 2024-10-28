@@ -3,7 +3,7 @@
           name: "{{ ansible_hostname }}"
 
           restapi:
-              listen: "{{ ansible_host }}8008"
+              listen: "{{ ansible_host }}:8008"
               connect_address: "{{ ansible_host }}:8008"
 
           etcd:
