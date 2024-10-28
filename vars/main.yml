@@ -1,11 +1,11 @@
 ---
 port_firewalld:
   - '5432/tcp'
-  # - '5433/tcp'
-  # - '5434/tcp'
-  # - '2379/tcp'
-  # - '2380/tcp'
-  # - '8008/tcp'
+  - '5433/tcp'
+  - '5434/tcp'
+  - '2379/tcp'
+  - '2380/tcp'
+  - '8008/tcp'
 firewalld_service: firewalld.service
 firewalld_rich_rule: rule protocol value="vrrp" accept
 chrony_service: chronyd.service

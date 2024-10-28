@@ -61,16 +61,14 @@
 
     - name: open port for Patroni, ETCD, HA-Proxy
       ansible.posix.firewalld:
-        port: "{{ item }}"
+        port: "{{ item|join() }}"
         # port: "{{ port_firewalld }}"
         state: enabled
         permanent: true
         immediate: true
         # zone: public
-      loop:
-        - "{{ port_firewalld | list }}"
-      loop_control:
-        label: "{{ item }}"
+      with_items:
+        - "{{ port_firewalld }}"
       # ignore_errors: true
       register: open_port_firewalld
       tags:
