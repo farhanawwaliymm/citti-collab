@@ -73,7 +73,7 @@
 
     - name: Open Port For Patroni, ETCD, and HAProxy
       command: "firewall-cmd --add-port='{{ item|list }}'  --permanent"
-      ignore_errors: true
+      # ignore_errors: true
       loop:
         - "{{ port_firewalld }}"
       register: open_port_firewalld
