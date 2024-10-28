@@ -1,4 +1,4 @@
-ETCD_NAME="{{ ansible_hostname }}"
+ETCD_NAME="{% for item in groups['all'] %}{{ 'etcd'loop.index if item == ansible_host }}{% endfor %}"
 ETCD_DATA_DIR="/var/lib/etcd"
 ETCD_LISTEN_CLIENT_URLS="http://{{ ansible_host }}:2379,http://localhost:2379"
 ETCD_LISTEN_PEER_URLS="http://{{ ansible_host }}:2380,http://localhost:2380"
@@ -6,7 +6,7 @@ ETCD_ADVERTISE_CLIENT_URLS="http://{{ ansible_host }}:2379"
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{ ansible_host }}:2380"
 ETCD_ELECTION_TIMEOUT=5000
 ETCD_HEARTBEAT_INTERVAL=250
-ETCD_INITIAL_CLUSTER="etcd1=http://192.168.1.21:2380,etcd2=http://192.168.1.22:2380,etcd3=http://192.168.1.23:2380"
+ETCD_INITIAL_CLUSTER="{% for item in groups['all'] %}etcd{{ loop.index }}=http://{{ item }}:2380{{ "," if not loop.last }}{% endfor %}"
 ETCD_INITIAL_CLUSTER_STATE="new"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_ENABLE_V2="true"
