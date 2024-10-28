@@ -1,7 +1,7 @@
 scope: citti
 namespace: /clusterdev/
 name: pgnode1
-ETCD_NAME="etcd1"
+ETCD_NAME="{{ ansible_hostname }}"
 ETCD_DATA_DIR="/var/lib/etcd"
 ETCD_LISTEN_CLIENT_URLS="http://{{ ansible_host }}:2379,http://localhost:2379"
 ETCD_LISTEN_PEER_URLS="http://{{ ansible_host }}:2380,http://localhost:2380"
