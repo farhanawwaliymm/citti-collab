@@ -156,7 +156,7 @@
         state: directory
         owner: "postgres"
         group: "postgres"
-        mode: "0700"
+        mode: "0644"
       register: ensure_pg_archive_directory
 
     - name: Ensure Patroni configuration file exists
