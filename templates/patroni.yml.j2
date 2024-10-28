@@ -1,80 +1,77 @@
-{%raw%}
-scope: citti
-namespace: /clusterdev/
-name: "{%endraw%}{{ ansible_hostname }}{%raw%}"
+          scope: citti
+          namespace: /clusterdev/
+          name: "{{ ansible_hostname }}"
 
-restapi:
-    listen: {%endraw%}{{ ansible_host }}{%raw%}:8008
-    connect_address: {%endraw%}{{ ansible_host }}{%raw%}:8008
+          restapi:
+              listen: "{{ ansible_host }}"
+              connect_address: "{{ ansible_host }}:8008"
 
-etcd:
-    hosts: {%endraw%}{% for item in groups['all'] %}{{ item }}:2379{{ "," if not loop.last }}{% endfor %}{%raw%}
+          etcd:
+              hosts: "{% for item in groups['all'] %}{{ item }}:2379{{ ',' if not loop.last }}{% endfor %}"
 
-bootstrap:
-  dcs:
-    ttl: 30
-    loop_wait: 10
-    retry_timeout: 10
-    maximum_lag_on_failover: 1048576
-    postgresql:
-      use_pg_rewind: true
-      use_slots: true
-      parameters:
-        password_encryption: scram-sha-256
-        max_connections: 100
-        shared_buffers: 512MB
-        effective_cache_size: 1.5GB
-        maintenance_work_mem: 128MB
-        checkpoint_completion_target: 0.9
-        wal_buffers: 16MB
-        default_statistics_target: 100
-        random_page_cost: 1.1
-        effective_io_concurrency: 200
-        work_mem: 2621kB
-        huge_pages: off
-        min_wal_size: 512MB
-        max_wal_size: 1GB
-        max_worker_processes: 2
-        max_parallel_workers_per_gather: 1
-        max_parallel_workers: 1
-        max_parallel_maintenance_workers: 1
+          bootstrap:
+            dcs:
+              ttl: 30
+              loop_wait: 10
+              retry_timeout: 10
+              maximum_lag_on_failover: 1048576
+              postgresql:
+                use_pg_rewind: true
+                use_slots: true
+                parameters:
+                  password_encryption: scram-sha-256
+                  max_connections: 100
+                  shared_buffers: 512MB
+                  effective_cache_size: 1.5GB
+                  maintenance_work_mem: 128MB
+                  checkpoint_completion_target: 0.9
+                  wal_buffers: 16MB
+                  default_statistics_target: 100
+                  random_page_cost: 1.1
+                  effective_io_concurrency: 200
+                  work_mem: 2621kB
+                  huge_pages: off
+                  min_wal_size: 512MB
+                  max_wal_size: 1GB
+                  max_worker_processes: 2
+                  max_parallel_workers_per_gather: 1
+                  max_parallel_workers: 1
+                  max_parallel_maintenance_workers: 1
 
-  initdb :
-  - auth: scram-sha-256
-  - encoding: UTF8
-  - data-checksums
+            initdb :
+            - auth: scram-sha-256
+            - encoding: UTF8
+            - data-checksums
 
 
-  pg_hba:
-  - host all all 192.168.1.0/24 scram-sha-256
-  - host replication replicator 127.0.0.1/32 scram-sha-256
-  - host replication replicator 192.168.1.21/32 scram-sha-256
-  - host replication replicator 192.168.1.22/32 scram-sha-256
-  - host replication replicator 192.168.1.23/32 scram-sha-256
-  - host all all 0.0.0.0/0 scram-sha-256
+            pg_hba:
+            - host all all 192.168.1.0/24 scram-sha-256
+            - host replication replicator 127.0.0.1/32 scram-sha-256
+            - host replication replicator 192.168.1.21/32 scram-sha-256
+            - host replication replicator 192.168.1.22/32 scram-sha-256
+            - host replication replicator 192.168.1.23/32 scram-sha-256
 
-  postgresql:
-    listen: {%endraw%}{{ ansible_host }}{%raw%}:5432
-    connect_address: {%endraw%}{{ ansible_host }}{%raw%}:5432
-    data_dir: /psql/citti/data
-    bin_dir: /usr/pgsql-16/bin
-    pgpass: /tmp/pgpass
-    authentication:
-    replication:
-      username: replicator
-      password: replicator
-    superuser:
-      username: postgres
-      password: patroni
+          postgresql:
+            listen: "{{ ansible_host }}:5432"
+            connect_address: "{{ ansible_host }}:5432"
+            data_dir: /psql/citti/data/
+            bin_dir: /usr/pgsql-16/bin
+            pgpass: /tmp/pgpass
+            authentication:
+              replication:
+                username: replicator
+                password: replicator
+              superuser:
+                username: postgres
+                password: patroni
 
-  parameters:
-    shared_preload_libraries: 'pg_stat_statements, pg_cron'
-    track_activity_query_size: 2048
-    pg_stat_statements.track: all
+            parameters:
+              shared_preload_libraries: 'pg_stat_statements, pg_cron'
+              track_activity_query_size: 2048
+              pg_stat_statements.track: all
 
-  tags:
-    nofailover: false
-    noloadbalance: false
-    clonefrom: false
-    nosync: false
-{%endraw%}
+            tags:
+              nofailover: false
+              noloadbalance: false
+              clonefrom: false
+              nosync: false
