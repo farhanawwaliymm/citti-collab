@@ -5,7 +5,7 @@
   become: yes
   become_user: root
   vars_files:
-    - ../vars/main.yml
+    - main.yml
 
   tasks:
 ######## OS SETUP ###########
@@ -116,7 +116,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: ../templates/etcd.conf.j2
+        src: etcd.conf.j2
         dest: "{{ etcd_config_file }}"
         backup: true
       register: config_etcdconf
@@ -177,7 +177,7 @@
 
     - name: Ensure lines are present in Patroni configuration file
       ansible.builtin.template:
-        src: ../templates/patroni.yml.j2
+        src: patroni.yml.j2
         dest: "{{ patroni_config_file_yml }}"
         owner: root
         group: root
@@ -208,7 +208,7 @@
 
     - name: Ensure lines are present in Patroni service file
       ansible.builtin.template:
-        src: ../templates/patroni_service.j2
+        src: patroni_service.j2
         dest: "{{ patroni_service_file }}"
         owner: "root"
         group: "root"
