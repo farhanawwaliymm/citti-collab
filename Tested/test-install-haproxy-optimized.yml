@@ -22,7 +22,7 @@
         port: "{{ item }}/tcp"
         permanent: true
         immediate: true
-        state: present
+        state: enabled
       loop:
         - "{{ port_firewalld }}"
       ignore_errors: true
