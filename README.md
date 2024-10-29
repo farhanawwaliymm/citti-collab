@@ -5,7 +5,7 @@ this playbook is for deploy patroni using Ansible
 
 ## User Defined Variable
 
-Variable that can be changed by user. defined by default in playbook.
+Variable that can be changed by user. defined by default in playbook. you can change this variable in vars/main.yml
 
 ```yaml
 ---
