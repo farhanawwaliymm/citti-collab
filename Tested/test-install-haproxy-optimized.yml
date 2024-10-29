@@ -155,7 +155,7 @@
     - name: Ensure lines are present in keepalived configuration file
       vars:
         state: "{{ 'master' if ansible_host == master_ip else 'backup' }}"
-        iface_used: "{{ iface | default() }}"
+        iface_used: "{{ iface | default('enp0s3') }}"
       ansible.builtin.template:
         src: ../templates/keepalived.conf.j2
         dest: "{{ keepalived_config_file }}"
