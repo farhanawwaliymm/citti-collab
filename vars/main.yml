@@ -40,4 +40,4 @@ haproxy_service: haproxy.service
 
 keepalived_config_file: /etc/keepalived/keepalived.conf
 keepalived_service: keepalived.service
-master_ip: 192.168.1.24
+master_ip: '192.168.1.24'
