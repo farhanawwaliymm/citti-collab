@@ -2,7 +2,7 @@
 
 global_defs {
     notification_email {
-      farhan@gmail.com  (email depends on you)
+      {{ notification_mail }} (email depends on you)
     }
     notification_email_from dba@gmail.com
     smtp_server 127.0.0.1
@@ -30,7 +30,7 @@ vrrp_instance VI_1 {
     }
 
     virtual_ipaddress {
-        192.168.1.111 dev {{ iface_used }} #This is depends on Virtual IP that will used by Client.
+        {{ virtual_ip_addr }} dev {{ iface_used }} #This is depends on Virtual IP that will used by Client.
     }
     track_script {
       haproxy

@@ -54,4 +54,10 @@ keepalived_config_file:
 #this variable is for keepalive configuration file path. default value is /etc/keepalived/keepalived.conf
 keepalived_service:
 #this variable is for enable keepalive service. default value is keepalived.service
+master_ip:
+#this variable is for defining keepalived master ip.
+virtual_ip_addr:
+#this variable is for defining virtual ip for keepalived
+notification_mail:
+#this variable is for defining email notification for keepalived
 ```
