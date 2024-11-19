@@ -226,12 +226,70 @@
 
     - name: Ensure lines are present in pgnode1.json file
       ansible.builtin.template:
-        src: server.json.j2
+        src: pgnode1.json.j2
         dest: "/root/cfssl/pgnode1.json"
         owner: root
         group: root
         mode: "0700"
       register: config_pgnode1json
+      tags:
+        - cfssl_config
+
+#####################################################pgnode2.json##################################################################
+
+    - name: Ensure pgnode2.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/pgnode2.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_pgnode2_json_exist
+
+    - name: Delete all existing lines in the pgnode2.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/pgnode2.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_pgnode2json
+
+    - name: Ensure lines are present in pgnode2.json file
+      ansible.builtin.template:
+        src: pgnode2.json.j2
+        dest: "/root/cfssl/pgnode2.json"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_pgnode2json
+      tags:
+        - cfssl_config
+
+#####################################################pgnode3.json##################################################################
+
+    - name: Ensure pgnode3.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/pgnode3.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_pgnode3_json_exist
+
+    - name: Delete all existing lines in the pgnode2.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/pgnode3.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_pgnode3json
+
+    - name: Ensure lines are present in pgnode3.json file
+      ansible.builtin.template:
+        src: pgnode3.json.j2
+        dest: "/root/cfssl/pgnode3.json"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_pgnode3json
       tags:
         - cfssl_config
 
