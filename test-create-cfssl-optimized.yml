@@ -81,18 +81,27 @@
 ######## Create Certificate ########
 
 ######## config stage ########
+    - name: Ensure cfssl directory is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: "{{ certificate_directory }}"
+        state: directory
+        owner: "postgres"
+        group: "postgres"
+        mode: "0700"
+      register: ensure_patroni_data_directory
+
     - name: Ensure ca-csr.json configuration file exists
       ansible.builtin.file:
-        path: "{{ patroni_config_file_yml }}"
+        path: "/root/cfssl/ca-csr.json"
         state: touch
         owner: "root"
         group: "root"
         mode: "0644"
-      register: ensure_patroni_config_exist
+      register: ensure_ca_csr_json_exist
 
     - name: Delete all existing lines in the ca-csr.json file
       ansible.builtin.lineinfile:
-        path: "{{ patroni_config_file_yml }}"
+        path: "{{ certificate_directory }}"
         regexp: '.*'
         state: absent
       register: delete_existingline_patroniconf
@@ -100,7 +109,7 @@
     - name: Ensure lines are present in ca-csr.json file
       ansible.builtin.template:
         src: patroni.yml.j2
-        dest: "{{ patroni_config_file_yml }}"
+        dest: "{{ certificate_directory }}"
         owner: root
         group: root
         mode: "0644"
@@ -110,7 +119,32 @@
 
 
 
+    - name: Ensure ca-csr.json configuration file exists
+      ansible.builtin.file:
+        path: "{{ certificate_directory }}"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: ensure_patroni_config_exist
 
+    - name: Delete all existing lines in the ca-csr.json file
+      ansible.builtin.lineinfile:
+        path: "{{ certificate_directory }}"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_patroniconf
+
+    - name: Ensure lines are present in ca-csr.json file
+      ansible.builtin.template:
+        src: patroni.yml.j2
+        dest: "{{ certificate_directory }}"
+        owner: root
+        group: root
+        mode: "0644"
+      register: config_patroniconf
+      tags:
+        - patroni_config
 
 
 

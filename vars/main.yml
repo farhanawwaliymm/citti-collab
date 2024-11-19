@@ -34,7 +34,7 @@ patroni_pg_archive_directory: /psqlarchive/citti/archive
 patroni_config_file_yml: /etc/patroni/patroni-citti.yml
 patroni_service_file: /usr/lib/systemd/system/patroni-citti.service
 patroni_service: patroni-citti.service
-certificate_directory: /etc/ssl
+certificate_directory: /root/cfssl
 
 haproxy_config_file: /etc/haproxy/haproxy.cfg
 haproxy_service: haproxy.service
