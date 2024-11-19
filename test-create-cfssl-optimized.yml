@@ -350,6 +350,39 @@
       register: config_generate_cluster_certs_sh
       tags:
         - cfssl_config
+
+######################################################generate the certificate files###################################################
+
+    - name: Execute generate-root-ca.sh
+      command: "./root/cfssl/generate-root-ca.sh"
+
+    - name: Execute generate-cluster-certs.sh
+      command: "./root/cfssl/generate-cluster-certs.sh"
+
+##################################################copy file#####################################################################
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/ca.pem
+        dest: /etc/ssl/ca.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/server.pem
+        dest: /etc/ssl/server.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/client.pem
+        dest: /etc/ssl/client.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
 #######################################################################################################################
 
 
