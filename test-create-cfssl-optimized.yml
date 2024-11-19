@@ -1,0 +1,179 @@
+---
+- name: Install and Config CFSSL
+  hosts: all
+  gather_facts: true
+  become: yes
+  become_user: root
+  vars_files:
+    - main.yml
+
+  tasks:
+######## OS SETUP ###########
+    - name: debug hostname
+      ansible.builtin.debug:
+        var: ansible_hostname
+
+    - name: Disable PostgreSQL module in DNF configuration
+      ansible.builtin.command: "dnf -qy module disable postgresql"
+      register: disable_postgre_module_dnf
+
+    - name: install PostgreSQL Repository
+      ansible.builtin.dnf:
+        name: "{{ postgresql_repo }}"
+        state: present
+        disable_gpg_check: true
+      register: install_postgre_repo
+
+    - name: Enable RHEL8 Extras Repository
+      command: "dnf config-manager --enable pgdg-rhel8-extras"
+      register: enable_extra_repo
+
+    - name: install needed package
+      ansible.builtin.dnf:
+        name: "{{ package_install }}"
+        state: present
+        disable_gpg_check: true
+      register: installed_needed_package
+
+    - name: Copy default config file
+      ansible.builtin.copy:
+        src: "{{ etcd_config_file }}"
+        dest: "{{ etcd_config_file }}.bak"
+        remote_src: true
+        backup: true
+      register: copy_default_config_etcd
+
+    - name: Install CFSSL
+      command: "curl -L -o /bin/cfssl https://github.com/cloudflare/cfssl/releases/download/v1.6.5/cfssl_1.6.5_linux_amd64"
+
+    - name: Install CFSSLJSON
+      command: "curl -L -o /bin/cfssljson https://github.com/cloudflare/cfssl/releases/download/v1.6.5/cfssljson_1.6.5_linux_amd64"
+
+    - name: Install CFSSL-CERTINFO
+      command: "curl -L -o /bin/cfssl-certinfo https://github.com/cloudflare/cfssl/releases/download/v1.6.5/cfssl-certinfo_1.6.5_linux_amd64"
+
+    - name: Ensure cfssl binary is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: /bin/cfssl
+        owner: "root"
+        group: "root"
+        mode: +x
+      register: ensure_cfssl_binary
+
+    - name: Ensure cfssljson binary is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: /bin/cfssljson
+        owner: "root"
+        group: "root"
+        mode: +x
+      register: ensure_cfssljson_binary
+
+    - name: Ensure cfssl-certinfo binary is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: /bin/cfssl-certinfo
+        owner: "root"
+        group: "root"
+        mode: +x
+      register: ensure_cfssl_certinfo_binary
+
+    - name: Delete all existing lines in the config file
+      ansible.builtin.lineinfile:
+        path: "{{ etcd_config_file }}"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_etcdconf
+
+    - name: Ensure lines are present in Patroni configuration file
+      ansible.builtin.template:
+        src: etcd.conf.j2
+        dest: "{{ etcd_config_file }}"
+        backup: true
+      register: config_etcdconf
+
+######## install patroni ########
+
+######## config stage ########
+    - name: Ensure Patroni directory is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: /bin/cfssl
+        owner: "root"
+        group: "root"
+        mode: +x
+      register: ensure_cfssl_binary
+
+    - name: Ensure Patroni data directory is created with correct ownership and permissions
+      ansible.builtin.file:
+        path: "{{ patroni_data_directory }}"
+        state: directory
+        owner: "postgres"
+        group: "postgres"
+        mode: "0700"
+      register: ensure_patroni_data_directory
+
+    - name: Ensure Patroni configuration file exists
+      ansible.builtin.file:
+        path: "{{ patroni_config_file_yml }}"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: ensure_patroni_config_exist
+
+    - name: Delete all existing lines in the config file
+      ansible.builtin.lineinfile:
+        path: "{{ patroni_config_file_yml }}"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_patroniconf
+
+    - name: Ensure lines are present in Patroni configuration file
+      ansible.builtin.template:
+        src: patroni.yml.j2
+        dest: "{{ patroni_config_file_yml }}"
+        owner: root
+        group: root
+        mode: "0644"
+      register: config_patroniconf
+      tags:
+        - patroni_config
+
+    - name: Create Patroni service file
+      ansible.builtin.file:
+        path: "{{ patroni_service_file }}"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+        state: touch
+      register: patroni_servicefile
+      tags:
+        - patroni_config
+
+    - name: Delete all existing lines in the service file
+      ansible.builtin.lineinfile:
+        path: "{{ patroni_service_file }}"
+        regexp: '.*'
+        state: absent
+      register: patroni_servicefile_clean
+      tags:
+        - patroni_config
+
+    - name: Ensure lines are present in Patroni service file
+      ansible.builtin.template:
+        src: patroni_service.j2
+        dest: "{{ patroni_service_file }}"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: config_patroni_service
+      tags:
+        - patroni_config
+
+    - name: Enable patroni service
+      ansible.builtin.systemd_service:
+        name: "{{ patroni_service }}"
+        enabled: yes
+        state: started
+      register: start_patroni_service
+      tags:
+        - patroni_config
+...
