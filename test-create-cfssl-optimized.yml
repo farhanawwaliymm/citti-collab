@@ -85,10 +85,10 @@
       ansible.builtin.file:
         path: "{{ certificate_directory }}"
         state: directory
-        owner: "postgres"
-        group: "postgres"
+        owner: "root"
+        group: "root"
         mode: "0700"
-      register: ensure_patroni_data_directory
+      register: ensure_certificate_directory
 
     - name: Ensure ca-csr.json configuration file exists
       ansible.builtin.file:
