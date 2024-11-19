@@ -76,6 +76,11 @@
         mode: +x
       register: ensure_cfssl_certinfo_binary
 
+
+
+######## install patroni ########
+
+######## config stage ########
     - name: Delete all existing lines in the config file
       ansible.builtin.lineinfile:
         path: "{{ etcd_config_file }}"
@@ -90,9 +95,6 @@
         backup: true
       register: config_etcdconf
 
-######## install patroni ########
-
-######## config stage ########
     - name: Ensure Patroni directory is created with correct ownership and permissions
       ansible.builtin.file:
         path: /bin/cfssl
