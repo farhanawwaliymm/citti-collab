@@ -98,7 +98,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_ca_csr_json_exist
 
     - name: Delete all existing lines in the ca-csr.json file
@@ -114,7 +114,7 @@
         dest: "/root/cfssl/ca-csr.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_cacsrjson
       tags:
         - cfssl_config
@@ -127,7 +127,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_ca_config_json_exist
 
     - name: Delete all existing lines in the ca-config.json file
@@ -143,7 +143,7 @@
         dest: "/root/cfssl/ca-config.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_caconfigjson
       tags:
         - cfssl_config
@@ -156,7 +156,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_server_json_exist
 
     - name: Delete all existing lines in the server.json file
@@ -172,7 +172,7 @@
         dest: "/root/cfssl/server.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_serverjson
       tags:
         - cfssl_config
@@ -185,7 +185,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_client_json_exist
 
     - name: Delete all existing lines in the client.json file
@@ -201,7 +201,7 @@
         dest: "/root/cfssl/client.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_clientjson
       tags:
         - cfssl_config
@@ -214,7 +214,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_pgnode1_json_exist
 
     - name: Delete all existing lines in the pgnode1.json file
@@ -230,7 +230,7 @@
         dest: "/root/cfssl/pgnode1.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_pgnode1json
       tags:
         - cfssl_config
@@ -243,7 +243,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_pgnode2_json_exist
 
     - name: Delete all existing lines in the pgnode2.json file
@@ -259,7 +259,7 @@
         dest: "/root/cfssl/pgnode2.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_pgnode2json
       tags:
         - cfssl_config
@@ -272,7 +272,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0644"
       register: ensure_pgnode3_json_exist
 
     - name: Delete all existing lines in the pgnode2.json file
@@ -288,7 +288,7 @@
         dest: "/root/cfssl/pgnode3.json"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0644"
       register: config_pgnode3json
       tags:
         - cfssl_config
@@ -301,7 +301,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0700"
+        mode: "0750"
       register: ensure_generate_root_ca_sh_exist
 
     - name: Delete all existing lines in the generate-root-ca.sh file
@@ -317,12 +317,39 @@
         dest: "/root/cfssl/generate-root-ca.sh"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0750"
       register: config_generate_root_ca_sh
       tags:
         - cfssl_config
 
+############################################generate-cluster-certs.sh##################################################################
 
+    - name: Ensure generate-cluster-certs.sh configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/generate-cluster-certs.sh"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0750"
+      register: ensure_generate_cluster_certs_sh_exist
+
+    - name: Delete all existing lines in the generate-cluster-certs.sh file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/generate-cluster-certs.sh"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_generate_cluster_certs_sh
+
+    - name: Ensure lines are present in generate-cluster-certs.sh file
+      ansible.builtin.template:
+        src: generate-cluster-certs.sh.j2
+        dest: "/root/cfssl/generate-cluster-certs.sh"
+        owner: root
+        group: root
+        mode: "0750"
+      register: config_generate_cluster_certs_sh
+      tags:
+        - cfssl_config
 #######################################################################################################################
 
 
