@@ -111,7 +111,7 @@
     - name: Ensure lines are present in ca-csr.json file
       ansible.builtin.template:
         src: ca-csr.json.j2
-        dest: "{{ certificate_directory }}"
+        dest: "/root/cfssl/ca-csr.json"
         owner: root
         group: root
         mode: "0700"
@@ -140,13 +140,43 @@
     - name: Ensure lines are present in ca-config.json file
       ansible.builtin.template:
         src: ca-config.json.j2
-        dest: "{{ certificate_directory }}"
+        dest: "/root/cfssl/ca-config.json"
         owner: root
         group: root
         mode: "0700"
       register: config_caconfigjson
       tags:
         - cfssl_config
+
+#####################################################server.json##################################################################
+
+    - name: Ensure server.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/server.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_server_json_exist
+
+    - name: Delete all existing lines in the server.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/server.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_serverjson
+
+    - name: Ensure lines are present in server.json file
+      ansible.builtin.template:
+        src: server.json.j2
+        dest: "/root/cfssl/server.json"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_serverjson
+      tags:
+        - cfssl_config
+
 #######################################################################################################################
 
 
