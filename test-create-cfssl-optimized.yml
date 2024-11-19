@@ -177,6 +177,64 @@
       tags:
         - cfssl_config
 
+#####################################################client.json##################################################################
+
+    - name: Ensure client.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/client.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_client_json_exist
+
+    - name: Delete all existing lines in the client.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/client.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_clientjson
+
+    - name: Ensure lines are present in client.json file
+      ansible.builtin.template:
+        src: client.json.j2
+        dest: "/root/cfssl/client.json"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_clientjson
+      tags:
+        - cfssl_config
+
+#####################################################pgnode1.json##################################################################
+
+    - name: Ensure pgnode1.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/pgnode1.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_pgnode1_json_exist
+
+    - name: Delete all existing lines in the pgnode1.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/pgnode1.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_pgnode1json
+
+    - name: Ensure lines are present in pgnode1.json file
+      ansible.builtin.template:
+        src: server.json.j2
+        dest: "/root/cfssl/pgnode1.json"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_pgnode1json
+      tags:
+        - cfssl_config
+
 #######################################################################################################################
 
 
