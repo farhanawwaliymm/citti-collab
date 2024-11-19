@@ -353,34 +353,6 @@
 #######################################################################################################################
 
 
-    - name: Ensure ca-csr.json configuration file exists
-      ansible.builtin.file:
-        path: "{{ certificate_directory }}"
-        state: touch
-        owner: "root"
-        group: "root"
-        mode: "0644"
-      register: ensure_patroni_config_exist
-
-    - name: Delete all existing lines in the ca-csr.json file
-      ansible.builtin.lineinfile:
-        path: "{{ certificate_directory }}"
-        regexp: '.*'
-        state: absent
-      register: delete_existingline_patroniconf
-
-    - name: Ensure lines are present in ca-csr.json file
-      ansible.builtin.template:
-        src: patroni.yml.j2
-        dest: "{{ certificate_directory }}"
-        owner: root
-        group: root
-        mode: "0644"
-      register: config_patroniconf
-      tags:
-        - patroni_config
-
-
 
 
     - name: Delete all existing lines in the config file
