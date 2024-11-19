@@ -88,7 +88,9 @@
         owner: "root"
         group: "root"
         mode: "0700"
-      register: ensure_certificate_directory
+      register: ensure_cfssl_directory
+
+#####################################################ca-csr.json##################################################################
 
     - name: Ensure ca-csr.json configuration file exists
       ansible.builtin.file:
@@ -101,22 +103,51 @@
 
     - name: Delete all existing lines in the ca-csr.json file
       ansible.builtin.lineinfile:
-        path: "{{ certificate_directory }}"
+        path: "/root/cfssl/ca-csr.json"
         regexp: '.*'
         state: absent
-      register: delete_existingline_patroniconf
+      register: delete_existingline_cacsrjson
 
     - name: Ensure lines are present in ca-csr.json file
       ansible.builtin.template:
-        src: patroni.yml.j2
+        src: ca-csr.json.j2
         dest: "{{ certificate_directory }}"
         owner: root
         group: root
-        mode: "0644"
-      register: config_patroniconf
+        mode: "0700"
+      register: config_cacsrjson
       tags:
-        - patroni_config
+        - cfssl_config
 
+#####################################################ca-config.json##################################################################
+
+    - name: Ensure ca-csr.json configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/ca-csr.json"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: ensure_ca_csr_json_exist
+
+    - name: Delete all existing lines in the ca-csr.json file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/ca-csr.json"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_cacsrjson
+
+    - name: Ensure lines are present in ca-csr.json file
+      ansible.builtin.template:
+        src: ca-csr.json.j2
+        dest: "{{ certificate_directory }}"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_cacsrjson
+      tags:
+        - cfssl_config
+#######################################################################################################################
 
 
     - name: Ensure ca-csr.json configuration file exists
