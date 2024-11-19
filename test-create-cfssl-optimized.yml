@@ -293,6 +293,36 @@
       tags:
         - cfssl_config
 
+#####################################################generate-root-ca.sh##################################################################
+
+    - name: Ensure generate-root-ca.sh configuration file exists
+      ansible.builtin.file:
+        path: "/root/cfssl/generate-root-ca.sh"
+        state: touch
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      register: ensure_generate_root_ca_sh_exist
+
+    - name: Delete all existing lines in the generate-root-ca.sh file
+      ansible.builtin.lineinfile:
+        path: "/root/cfssl/generate-root-ca.sh"
+        regexp: '.*'
+        state: absent
+      register: delete_existingline_generate_root_ca_sh
+
+    - name: Ensure lines are present in generate-root-ca.sh file
+      ansible.builtin.template:
+        src: generate-root-ca.sh.j2
+        dest: "/root/cfssl/generate-root-ca.sh"
+        owner: root
+        group: root
+        mode: "0700"
+      register: config_generate_root_ca_sh
+      tags:
+        - cfssl_config
+
+
 #######################################################################################################################
 
 
