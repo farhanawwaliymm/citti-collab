@@ -370,6 +370,14 @@
 
     - name: Copy file to target folder with correct owner and permissions
       copy:
+        src: /root/cfssl/ca-key.pem
+        dest: /etc/ssl/ca-key.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'        
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
         src: /root/cfssl/server.pem
         dest: /etc/ssl/server.pem
         owner: etcd
@@ -378,8 +386,72 @@
 
     - name: Copy file to target folder with correct owner and permissions
       copy:
+        src: /root/cfssl/server-key.pem
+        dest: /etc/ssl/server-key.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
         src: /root/cfssl/client.pem
         dest: /etc/ssl/client.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/client-key.pem
+        dest: /etc/ssl/client-key.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode1.pem
+        dest: /etc/ssl/pgnode1.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode1-key.pem
+        dest: /etc/ssl/pgnode1-key.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode2.pem
+        dest: /etc/ssl/pgnode2.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode2-key.pem
+        dest: /etc/ssl/pgnode2-key.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode3.pem
+        dest: /etc/ssl/pgnode3.pem
+        owner: etcd
+        group: etcd
+        mode: '0644'
+
+    - name: Copy file to target folder with correct owner and permissions
+      copy:
+        src: /root/cfssl/pgnode3-key.pem
+        dest: /etc/ssl/pgnode3-key.pem
         owner: etcd
         group: etcd
         mode: '0644'
