@@ -354,10 +354,12 @@
 ######################################################generate the certificate files###################################################
 
     - name: Execute generate-root-ca.sh
-      command: "/root/cfssl/generate-root-ca.sh"
+      command: /root/cfssl/generate-root-ca.sh
+      become: yes
 
     - name: Execute generate-cluster-certs.sh
-      command: "/root/cfssl/generate-cluster-certs.sh"
+      command: /root/cfssl/generate-cluster-certs.sh
+      become: yes
 
 ##################################################copy file#####################################################################
     - name: Copy file to target folder with correct owner and permissions
