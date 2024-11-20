@@ -360,7 +360,7 @@
 
     - name: Execute generate-cluster-certs.sh
 #      command: /root/cfssl/generate-cluster-certs.sh
-      shell: /root/cfssl/generate-root-ca.sh
+      shell: /root/cfssl/generate-cluster-certs.sh
       become: yes
 
 ##################################################copy file#####################################################################
