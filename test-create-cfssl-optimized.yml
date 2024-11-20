@@ -301,7 +301,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0750"
+        mode: "0755"
       register: ensure_generate_root_ca_sh_exist
 
     - name: Delete all existing lines in the generate-root-ca.sh file
@@ -317,7 +317,7 @@
         dest: "/root/cfssl/generate-root-ca.sh"
         owner: root
         group: root
-        mode: "0750"
+        mode: "0755"
       register: config_generate_root_ca_sh
       tags:
         - cfssl_config
@@ -330,7 +330,7 @@
         state: touch
         owner: "root"
         group: "root"
-        mode: "0750"
+        mode: "0755"
       register: ensure_generate_cluster_certs_sh_exist
 
     - name: Delete all existing lines in the generate-cluster-certs.sh file
@@ -346,7 +346,7 @@
         dest: "/root/cfssl/generate-cluster-certs.sh"
         owner: root
         group: root
-        mode: "0750"
+        mode: "0755"
       register: config_generate_cluster_certs_sh
       tags:
         - cfssl_config
