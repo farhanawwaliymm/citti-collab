@@ -365,97 +365,122 @@
 
 ##################################################copy file#####################################################################
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#        src: "{{ etcd_config_file }}"
+#        dest: "{{ etcd_config_file }}.bak"
         src: /root/cfssl/ca.pem
         dest: /etc/ssl/ca.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/ca-key.pem
         dest: /etc/ssl/ca-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'        
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/server.pem
         dest: /etc/ssl/server.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/server-key.pem
         dest: /etc/ssl/server-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/client.pem
         dest: /etc/ssl/client.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/client-key.pem
         dest: /etc/ssl/client-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode1.pem
         dest: /etc/ssl/pgnode1.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode1-key.pem
         dest: /etc/ssl/pgnode1-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode2.pem
         dest: /etc/ssl/pgnode2.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode2-key.pem
         dest: /etc/ssl/pgnode2-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode3.pem
         dest: /etc/ssl/pgnode3.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
 
     - name: Copy file to target folder with correct owner and permissions
-      copy:
+      ansible.builtin.copy:
+#      copy:
         src: /root/cfssl/pgnode3-key.pem
         dest: /etc/ssl/pgnode3-key.pem
+        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
