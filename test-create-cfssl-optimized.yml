@@ -388,10 +388,10 @@
         var: cfssl_files
       when: inventory_hostname == '192.168.1.21'
 
-#    - name: Set cfssl_files to an empty list for other hosts
-#      set_fact:
-#        cfssl_files: {"files": []}
-#      when: inventory_hostname != '192.168.1.21'
+    - name: Set cfssl_files to an empty list for other hosts
+      set_fact:
+        cfssl_files: {"files": []}
+      when: inventory_hostname != '192.168.1.21'
 
     - name: Debug the output of find module
       debug:
@@ -402,7 +402,7 @@
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
-      when: inventory_hostname == '192.168.1.21'
+#      when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
     - name: Copy CFSSL files to target hosts
