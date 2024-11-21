@@ -385,8 +385,7 @@
 
     - name: Debug the output of find module
       debug:
-        var: cfssl_files
-      loop: "{{ cfssl_files | default([]) }}"   
+        var: cfssl_files 
 
     - name: Set cfssl_files to an empty list for other hosts
       set_fact:
