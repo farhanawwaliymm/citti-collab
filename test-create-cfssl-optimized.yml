@@ -383,6 +383,11 @@
       register: cfssl_files
       when: inventory_hostname == '192.168.1.21'
 
+    - name: Debug the output of find module
+      debug:
+        var: cfssl_files
+      loop: "{{ cfssl_files | default([]) }}"   
+
     - name: Set cfssl_files to an empty list for other hosts
       set_fact:
         cfssl_files: {"files": []}
