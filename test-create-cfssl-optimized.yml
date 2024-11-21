@@ -402,7 +402,7 @@
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
-#      when: inventory_hostname == '192.168.1.21'
+      when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
     - name: Copy CFSSL files to target hosts
@@ -412,7 +412,7 @@
         owner: etcd
         group: etcd
         mode: '0644'
-#      when: inventory_hostname != '192.168.1.21'
+      when: inventory_hostname == '192.168.1.21,192.168.1.22,192.168.1.23'
       loop: "{{ cfssl_files.files | default([]) }}"
 
 
