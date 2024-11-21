@@ -383,9 +383,10 @@
       register: cfssl_files
       when: inventory_hostname == '192.168.1.21'
 
-    - name: Debug the output of find module
+    - name: Debug the output of find module on pgnode1
       debug:
-        var: cfssl_files 
+        var: cfssl_files
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Set cfssl_files to an empty list for other hosts
       set_fact:
