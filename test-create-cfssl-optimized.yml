@@ -363,27 +363,65 @@
       shell: /root/cfssl/generate-cluster-certs.sh
       become: yes
 
-##################################################copy file#####################################################################
-    - name: Copy file to target folder with correct owner and permissions
-      ansible.builtin.copy:
-#        src: "{{ etcd_config_file }}"
-#        dest: "{{ etcd_config_file }}.bak"
+
+#######################################################################################################################
+#- name: Copy CFSSL
+#  hosts: all
+#  gather_facts: true
+#  become: yes
+#  become_user: root
+#  vars_files:
+#    - main.yml
+
+#  tasks:
+    - name: Fetch file from 192.168.1.21
+      ansible.builtin.fetch:
         src: /root/cfssl/ca.pem
+        dest: /tmp/ca.pem
+        flat: yes
+      delegate_to: 192.168.1.21
+      when: inventory_hostname == '192.168.1.21'
+
+    - name: Copy file to 192.168.1.22
+      ansible.builtin.copy:
+        src: /tmp/ca.pem
         dest: /etc/ssl/ca.pem
-        remote_src: true
         owner: etcd
         group: etcd
         mode: '0644'
+      delegate_to: 192.168.1.22
+      when: inventory_hostname == '192.168.1.22'
 
-    - name: Copy file to target folder with correct owner and permissions
+    - name: Copy file to 192.168.1.23
       ansible.builtin.copy:
-#      copy:
-        src: /root/cfssl/ca-key.pem
-        dest: /etc/ssl/ca-key.pem
-        remote_src: true
+        src: /tmp/ca.pem
+        dest: /etc/ssl/ca.pem
         owner: etcd
         group: etcd
-        mode: '0644'        
+        mode: '0644'
+      delegate_to: 192.168.1.23
+      when: inventory_hostname == '192.168.1.23'      
+##################################################copy file#####################################################################
+#    - name: Copy file to target folder with correct owner and permissions
+#      ansible.builtin.copy:
+##        src: "{{ etcd_config_file }}"
+##        dest: "{{ etcd_config_file }}.bak"
+#        src: /root/cfssl/ca.pem
+#        dest: /etc/ssl/ca.pem
+#        remote_src: true
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'
+#
+#    - name: Copy file to target folder with correct owner and permissions
+#      ansible.builtin.copy:
+##      copy:
+#        src: /root/cfssl/ca-key.pem
+#        dest: /etc/ssl/ca-key.pem
+#        remote_src: true
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'        
 
     - name: Copy file to target folder with correct owner and permissions
       ansible.builtin.copy:
@@ -484,6 +522,6 @@
         owner: etcd
         group: etcd
         mode: '0644'
-#######################################################################################################################
+
 
 ...
