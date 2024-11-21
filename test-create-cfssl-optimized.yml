@@ -431,7 +431,7 @@
       delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.22'
 
-      - name: Copy CFSSL files from pgnode1 to target hosts
+    - name: Copy CFSSL files from pgnode1 to target hosts
       copy:
         src: "{{ item.path }}"
         dest: /etc/ssl/{{ item.path | basename }}
