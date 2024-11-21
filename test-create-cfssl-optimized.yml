@@ -390,7 +390,7 @@
 
     - name: Debug the output of find module
       debug:
-        var: cfssl_files
+        var: cfssl_files.files
 
     - name: Fetch CFSSL files
       fetch:
