@@ -374,6 +374,7 @@
 #    - main.yml
 
 #  tasks:
+
     - name: Find CFSSL files on pgnode1
       find:
         paths: /root/cfssl
@@ -382,14 +383,22 @@
       register: cfssl_files
       when: inventory_hostname == '192.168.1.21'
 
+    - name: Set cfssl_files to an empty list for other hosts
+      set_fact:
+        cfssl_files: {"files": []}
+      when: inventory_hostname != '192.168.1.21'
+
+    - name: Debug the output of find module
+      debug:
+        var: cfssl_files
+
     - name: Fetch CFSSL files
       fetch:
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
       when: inventory_hostname == '192.168.1.21'
-      loop: "{{ cfssl_files.files }}"
-
+      loop: "{{ cfssl_files.files | default([]) }}"
 
     - name: Copy CFSSL files to target hosts
       copy:
@@ -399,7 +408,36 @@
         group: etcd
         mode: '0644'
       when: inventory_hostname != '192.168.1.21'
-      loop: "{{ cfssl_files.files }}"
+      loop: "{{ cfssl_files.files | default([]) }}"
+
+
+
+#    - name: Find CFSSL files on pgnode1
+#      find:
+#        paths: /root/cfssl
+#        file_type: file
+#        patterns: "*.pem"
+#      register: cfssl_files
+#      when: inventory_hostname == '192.168.1.21'
+#
+#    - name: Fetch CFSSL files
+#      fetch:
+#        src: "{{ item.path }}"
+#        dest: /tmp/cfssl/
+#        flat: yes
+#      when: inventory_hostname == '192.168.1.21'
+#      loop: "{{ cfssl_files.files }}"
+#
+#
+#    - name: Copy CFSSL files to target hosts
+#      copy:
+#        src: /tmp/cfssl/{{ item.path | basename }}
+#        dest: /etc/ssl/{{ item.path | basename }}
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'
+#      when: inventory_hostname != '192.168.1.21'
+#      loop: "{{ cfssl_files.files }}"
 
 
 
