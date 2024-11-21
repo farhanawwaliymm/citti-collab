@@ -381,7 +381,9 @@
         file_type: file
         patterns: "*.pem"
       register: cfssl_files
-      when: inventory_hostname == '192.168.1.21'
+#      when: inventory_hostname == '192.168.1.21'
+      delegate_to: 192.168.1.21
+      run_once: true      
 
     - name: Debug the output of find module on pgnode1
       debug:
