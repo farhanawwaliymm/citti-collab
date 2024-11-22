@@ -414,10 +414,10 @@
       delegate_to: 192.168.1.21
       run_once: true      
 
-#    - name: Set cfssl_files to an empty list for other hosts
-#      set_fact:
-#        cfssl_files: {"files": []}
-#      when: inventory_hostname != '192.168.1.21'
+    - name: Set cfssl_files to an empty list for other hosts
+      set_fact:
+        cfssl_files: {"files": []}
+      when: inventory_hostname != '192.168.1.21'
 
     - name: Fetch CFSSL files
       fetch:
@@ -427,7 +427,7 @@
       when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
-    - name: Copy CFSSL files to target hosts
+    - name: Copy CFSSL files to pgnode1
       copy:
         src: "{{ item.path }}"
         dest: /etc/ssl/{{ item.path | basename }}
@@ -439,7 +439,7 @@
       delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.21'
 
-    - name: Copy CFSSL files to target hosts
+    - name: Copy CFSSL files to other hosts
       copy:
         src: "{{ item.path }}"
         dest: /etc/ssl/{{ item.path | basename }}
