@@ -436,7 +436,7 @@
       when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
-      - name: Copy CFSSL files from pgnode1 to target hosts
+    - name: Copy CFSSL files from pgnode1 to target hosts
       ansible.posix.synchronize:
         src: "{{ item.path }}"
         dest: rsync://192.168.1.22/etc/ssl/{{ item.path | basename }}
