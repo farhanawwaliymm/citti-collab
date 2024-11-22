@@ -439,10 +439,10 @@
     - name: Copy CFSSL files using rsync
       command: >
         rsync -avz /root/cfssl/{{ item.path | basename }}
-        root@{{ inventory_hostname }}:/etc/ssl/
+        root@192.168.1.22:/etc/ssl/
       delegate_to: 192.168.1.21
       loop: "{{ cfssl_files.files }}"
-      when: inventory_hostname != '192.168.1.21'
+#      when: inventory_hostname != '192.168.1.21'
 
 
 #    - name: Copy CFSSL files from pgnode1 to target hosts
