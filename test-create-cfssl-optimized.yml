@@ -440,10 +440,10 @@
       ansible.posix.synchronize:
         src: "{{ item.path }}"
         dest: rsync://192.168.1.22/etc/ssl/{{ item.path | basename }}
-        owner: etcd
-        group: etcd
-        mode: '0644'
-        remote_src: true
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'
+#        remote_src: true
       loop: "{{ cfssl_files.files }}"
       delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.21'
