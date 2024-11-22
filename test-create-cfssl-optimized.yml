@@ -414,10 +414,10 @@
       delegate_to: 192.168.1.21
       run_once: true      
 
-    - name: Set cfssl_files to an empty list for other hosts
-      set_fact:
-        cfssl_files: {"files": []}
-      when: inventory_hostname != '192.168.1.21'
+#    - name: Set cfssl_files to an empty list for other hosts
+#      set_fact:
+#        cfssl_files: {"files": []}
+#      when: inventory_hostname != '192.168.1.21'
 
     - name: Fetch CFSSL files
       fetch:
