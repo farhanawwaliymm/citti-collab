@@ -413,16 +413,17 @@
 #      when: inventory_hostname == '192.168.1.21'
       delegate_to: 192.168.1.21
       run_once: true      
-
+      when: ansible_hostname == '192.168.1.21'
+      
     - name: Debug the output of find module on pgnode1
       debug:
         var: cfssl_files
-      when: inventory_hostname == '192.168.1.21'
+      when: ansible_hostname == '192.168.1.21'
 
     - name: Set cfssl_files to an empty list for other hosts
       set_fact:
         cfssl_files: {"files": []}
-      when: inventory_hostname != '192.168.1.21'
+      when: ansible_hostname != '192.168.1.21'
 
     - name: Debug the output of find module
       debug:
@@ -433,7 +434,7 @@
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
-      when: inventory_hostname == '192.168.1.21'
+      when: ansible_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
 #    - name: Copy CFSSL files using rsync
