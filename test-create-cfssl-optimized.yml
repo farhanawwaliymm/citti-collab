@@ -89,7 +89,8 @@
         group: "root"
         mode: "0700"
       register: ensure_cfssl_directory
-
+      when: inventory_hostname == '192.168.1.21'
+      
 #####################################################ca-csr.json##################################################################
 
     - name: Ensure ca-csr.json configuration file exists
@@ -100,6 +101,7 @@
         group: "root"
         mode: "0644"
       register: ensure_ca_csr_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the ca-csr.json file
       ansible.builtin.lineinfile:
@@ -107,6 +109,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_cacsrjson
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in ca-csr.json file
       ansible.builtin.template:
@@ -116,6 +119,7 @@
         group: root
         mode: "0644"
       register: config_cacsrjson
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -129,6 +133,7 @@
         group: "root"
         mode: "0644"
       register: ensure_ca_config_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the ca-config.json file
       ansible.builtin.lineinfile:
@@ -136,6 +141,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_caconfigjson
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in ca-config.json file
       ansible.builtin.template:
@@ -145,6 +151,7 @@
         group: root
         mode: "0644"
       register: config_caconfigjson
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -158,6 +165,7 @@
         group: "root"
         mode: "0644"
       register: ensure_server_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the server.json file
       ansible.builtin.lineinfile:
@@ -165,6 +173,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_serverjson
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in server.json file
       ansible.builtin.template:
@@ -174,6 +183,7 @@
         group: root
         mode: "0644"
       register: config_serverjson
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -187,6 +197,7 @@
         group: "root"
         mode: "0644"
       register: ensure_client_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the client.json file
       ansible.builtin.lineinfile:
@@ -194,6 +205,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_clientjson
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in client.json file
       ansible.builtin.template:
@@ -203,6 +215,7 @@
         group: root
         mode: "0644"
       register: config_clientjson
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -216,6 +229,7 @@
         group: "root"
         mode: "0644"
       register: ensure_pgnode1_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the pgnode1.json file
       ansible.builtin.lineinfile:
@@ -223,6 +237,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_pgnode1json
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in pgnode1.json file
       ansible.builtin.template:
@@ -232,6 +247,7 @@
         group: root
         mode: "0644"
       register: config_pgnode1json
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -245,6 +261,7 @@
         group: "root"
         mode: "0644"
       register: ensure_pgnode2_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the pgnode2.json file
       ansible.builtin.lineinfile:
@@ -252,6 +269,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_pgnode2json
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in pgnode2.json file
       ansible.builtin.template:
@@ -261,6 +279,7 @@
         group: root
         mode: "0644"
       register: config_pgnode2json
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -274,6 +293,7 @@
         group: "root"
         mode: "0644"
       register: ensure_pgnode3_json_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the pgnode2.json file
       ansible.builtin.lineinfile:
@@ -281,6 +301,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_pgnode3json
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in pgnode3.json file
       ansible.builtin.template:
@@ -290,6 +311,7 @@
         group: root
         mode: "0644"
       register: config_pgnode3json
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -303,6 +325,7 @@
         group: "root"
         mode: "0755"
       register: ensure_generate_root_ca_sh_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the generate-root-ca.sh file
       ansible.builtin.lineinfile:
@@ -310,6 +333,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_generate_root_ca_sh
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in generate-root-ca.sh file
       ansible.builtin.template:
@@ -319,6 +343,7 @@
         group: root
         mode: "0755"
       register: config_generate_root_ca_sh
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -332,6 +357,7 @@
         group: "root"
         mode: "0755"
       register: ensure_generate_cluster_certs_sh_exist
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Delete all existing lines in the generate-cluster-certs.sh file
       ansible.builtin.lineinfile:
@@ -339,6 +365,7 @@
         regexp: '.*'
         state: absent
       register: delete_existingline_generate_cluster_certs_sh
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Ensure lines are present in generate-cluster-certs.sh file
       ansible.builtin.template:
@@ -348,6 +375,7 @@
         group: root
         mode: "0755"
       register: config_generate_cluster_certs_sh
+      when: inventory_hostname == '192.168.1.21'
       tags:
         - cfssl_config
 
@@ -357,12 +385,13 @@
       shell: /root/cfssl/generate-root-ca.sh
 #      command: /root/cfssl/generate-root-ca.sh
       become: yes
+      when: inventory_hostname == '192.168.1.21'
 
     - name: Execute generate-cluster-certs.sh
 #      command: /root/cfssl/generate-cluster-certs.sh
       shell: /root/cfssl/generate-cluster-certs.sh
       become: yes
-
+      when: inventory_hostname == '192.168.1.21'
 
 #######################################################################################################################
 #- name: Copy CFSSL
