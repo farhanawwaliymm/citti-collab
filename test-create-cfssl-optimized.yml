@@ -436,14 +436,24 @@
       when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
-    - name: Copy CFSSL files using rsync
-      command: >
-        rsync -avz /root/cfssl/{{ item.path | basename }}
-        root@192.168.1.22:/etc/ssl/
-      delegate_to: 192.168.1.21
-      loop: "{{ cfssl_files.files }}"
+#    - name: Copy CFSSL files using rsync
+#      command: >
+#        rsync -avz /root/cfssl/{{ item.path | basename }}
+#        root@192.168.1.22:/etc/ssl/
+#      delegate_to: 192.168.1.21
+#      loop: "{{ cfssl_files.files }}"
 #      when: inventory_hostname != '192.168.1.21'
 
+    - name: Copy CFSSL files to target hosts
+      copy:
+        src: "{{ item.path }}"
+        dest: /etc/ssl/{{ item.path | basename }}
+        owner: etcd
+        group: etcd
+        mode: '0644'
+      loop: "{{ cfssl_files.files }}"
+      delegate_to: 192.168.1.21
+      when: inventory_hostname != '192.168.1.21'
 
 #    - name: Copy CFSSL files from pgnode1 to target hosts
 #      ansible.posix.synchronize:
