@@ -430,18 +430,19 @@
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
+      loop: "{{ cfssl_files.files | default([]) }}"
       delegate_to: 192.168.1.21
 #      when: inventory_hostname == '192.168.1.21'
-      loop: "{{ cfssl_files.files | default([]) }}"
+#      loop: "{{ cfssl_files.files | default([]) }}"
 
     - name: Copy CFSSL files to pgnode1
       copy:
         src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}
+        dest: /etc/ssl/{{ item.path | basename }}"
         owner: etcd
         group: etcd
         mode: '0644'
-        remote_src: true
+#        remote_src: true
         force: true
       loop: "{{ cfssl_files.files }}"
 #      delegate_to: 192.168.1.21
@@ -464,10 +465,10 @@
     - name: Copy CFSSL files to other hosts
       copy:
         src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
+        dest: /etc/ssl/{{ item.path | basename }}"
+        owner: etcd
+        group: etcd
+        mode: '0644'
 #        remote_src: true
         force: true
 #        flat: yes
