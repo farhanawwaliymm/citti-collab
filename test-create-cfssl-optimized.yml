@@ -424,7 +424,7 @@
 
     - name: Fetch CFSSL files from pgnode1 to control node
       fetch:
-        src: "{{ item.path | regex_replace('["\']', '') }}"
+        src: "{{ item.path | regex_replace('[''\"'']', '') }}"
         dest: /tmp/cfssl/
         flat: yes
       loop: "{{ cfssl_files.files | default([]) }}"
