@@ -444,9 +444,9 @@
       copy:
         src: "{{ item.path }}"
         dest: /etc/ssl/{{ item.path | basename }}
-        owner: etcd
-        group: etcd
-        mode: '0644'
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'
         remote_src: true
         force: true
       loop: "{{ cfssl_files.files }}"
