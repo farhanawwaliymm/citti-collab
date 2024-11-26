@@ -403,18 +403,21 @@
 #    - main.yml
 
 #  tasks:
-- name: Manage CFSSL files
-  hosts: all
-  tasks:
+
     - name: Find CFSSL files on pgnode1
       find:
         paths: /root/cfssl
         file_type: file
         patterns: "*.pem"
       register: cfssl_files
+#      when: inventory_hostname == '192.168.1.21'
       delegate_to: 192.168.1.21
-      run_once: true
+      run_once: true      
 
+#    - name: Set cfssl_files to an empty list for other hosts
+#      set_fact:
+#        cfssl_files: {"files": []}
+#      when: inventory_hostname != '192.168.1.21'
     - name: Ensure local directory for fetched files
       file:
         path: /tmp/cfssl/
@@ -422,106 +425,64 @@
       delegate_to: localhost
       run_once: true
 
-    - name: Fetch CFSSL files from pgnode1 to control node
+    - name: Fetch CFSSL files
       fetch:
-        src: "{{ item.path | regex_replace('[''\"'']', '') }}"
+        src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
-      loop: "{{ cfssl_files.files | default([]) }}"
       delegate_to: 192.168.1.21
-    
+#      when: inventory_hostname == '192.168.1.21'
+      loop: "{{ cfssl_files.files | default([]) }}"
+
     - name: Copy CFSSL files to pgnode1
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
-        dest: /etc/ssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
+        src: "/tmp/cfssl/{{ item.path | basename }}"
+        dest: /etc/ssl/{{ item.path | basename }}
         owner: etcd
         group: etcd
         mode: '0644'
+        remote_src: true
+        force: true
       loop: "{{ cfssl_files.files }}"
-      when: inventory_hostname == '192.168.1.21'
-    
-    - name: Copy CFSSL files to pgnode2
-      copy:
-        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
-        dest: /etc/ssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
-        owner: etcd
-        group: etcd
-        mode: '0644'
-      loop: "{{ cfssl_files.files }}"
-      when: inventory_hostname != '192.168.1.21'
-#    - name: Find CFSSL files on pgnode1
-#      find:
-#        paths: /root/cfssl
-#        file_type: file
-#        patterns: "*.pem"
-#      register: cfssl_files
-##      when: inventory_hostname == '192.168.1.21'
 #      delegate_to: 192.168.1.21
-#      run_once: true      
-#
-##    - name: Set cfssl_files to an empty list for other hosts
-##      set_fact:
-##        cfssl_files: {"files": []}
-##      when: inventory_hostname != '192.168.1.21'
-#
-#    - name: Fetch CFSSL files
+      when: inventory_hostname == '192.168.1.21'
+
+#    - name: fetch CFSSL files to other hosts
 #      fetch:
 #        src: "{{ item.path }}"
-#        dest: /tmp/cfssl/
-#        flat: yes
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#      loop: "{{ cfssl_files.files | default([]) }}"
-#
-#    - name: Copy CFSSL files to pgnode1
-#      copy:
-#        src: "{{ item.path }}"
-#        dest: /etc/ssl/{{ item.path | basename }}
+#        dest: "/tmp/{{ item.path | basename }}"
 #        owner: etcd
 #        group: etcd
 #        mode: '0644'
 #        remote_src: true
 #        force: true
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: fetch CFSSL files to other hosts
-#      fetch:
-#        src: "{{ item.path }}"
-#        dest: "/tmp/{{ item.path | basename }}"
-##        owner: etcd
-##        group: etcd
-##        mode: '0644'
-##        remote_src: true
-#        force: true
 #        flat: yes
 #      loop: "{{ cfssl_files.files }}"
 #      delegate_to: 192.168.1.21
 #      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy CFSSL files to other hosts
-#      copy:
-#        src: "/tmp/{{ item.path | basename }}"
-#        dest: /etc/ssl/{{ item.path | basename }}
-##        owner: etcd
-##        group: etcd
-##        mode: '0644'
+
+    - name: Copy CFSSL files to other hosts
+      copy:
+        src: "/tmp/cfssl/{{ item.path | basename }}"
+        dest: /etc/ssl/{{ item.path | basename }}
+#        owner: etcd
+#        group: etcd
+#        mode: '0644'
 #        remote_src: true
-#        force: true
-##        flat: yes
-#      loop: "{{ cfssl_files.files }}"
-##      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Debug the output of find module on pgnode1
-#      debug:
-#        var: cfssl_files
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Debug the output of find module
-#      debug:
-#        var: cfssl_files.files
+        force: true
+#        flat: yes
+      loop: "{{ cfssl_files.files }}"
+#      delegate_to: 192.168.1.21
+      when: inventory_hostname != '192.168.1.22'
+
+    - name: Debug the output of find module on pgnode1
+      debug:
+        var: cfssl_files
+      when: inventory_hostname == '192.168.1.21'
+
+    - name: Debug the output of find module
+      debug:
+        var: cfssl_files.files
 #    - name: Copy CFSSL files using rsync
 #      command: >
 #        rsync -avz /root/cfssl/{{ item.path | basename }}
