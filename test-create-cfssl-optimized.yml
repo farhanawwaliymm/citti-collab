@@ -424,26 +424,26 @@
 
     - name: Fetch CFSSL files from pgnode1 to control node
       fetch:
-        src: "{{ item.path }}"
+        src: "{{ item.path | regex_replace('["\']', '') }}"
         dest: /tmp/cfssl/
         flat: yes
       loop: "{{ cfssl_files.files | default([]) }}"
       delegate_to: 192.168.1.21
-
+    
     - name: Copy CFSSL files to pgnode1
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}"
+        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
+        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}"
         owner: etcd
         group: etcd
         mode: '0644'
       loop: "{{ cfssl_files.files }}"
       when: inventory_hostname == '192.168.1.21'
-
+    
     - name: Copy CFSSL files to pgnode2
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}"
+        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
+        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}"
         owner: etcd
         group: etcd
         mode: '0644'
