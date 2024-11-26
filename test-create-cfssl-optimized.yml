@@ -424,6 +424,7 @@
         src: "{{ item.path }}"
         dest: /tmp/cfssl/
         flat: yes
+      delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.21'
       loop: "{{ cfssl_files.files | default([]) }}"
 
