@@ -444,7 +444,7 @@
     - name: fetch CFSSL files to other hosts
       fetch:
         src: "{{ item.path }}"
-        dest: /etc/ssl/{{ item.path | basename }}
+        dest: "/tmp/fetched_files/{{ item.path | basename }}"
 #        owner: etcd
 #        group: etcd
 #        mode: '0644'
@@ -457,12 +457,12 @@
 
     - name: Copy CFSSL files to other hosts
       copy:
-        src: "{{ item.path }}"
+        src: "/tmp/fetched_files/{{ item.path | basename }}"
         dest: /etc/ssl/{{ item.path | basename }}
 #        owner: etcd
 #        group: etcd
 #        mode: '0644'
-#        remote_src: true
+        remote_src: true
         force: true
 #        flat: yes
       loop: "{{ cfssl_files.files }}"
