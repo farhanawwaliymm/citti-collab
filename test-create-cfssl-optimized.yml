@@ -474,7 +474,7 @@
 #        flat: yes
       loop: "{{ cfssl_files.files }}"
 #      delegate_to: 192.168.1.21
-      when: inventory_hostname != '192.168.1.22'
+      when: inventory_hostname != '192.168.1.21'
 
     - name: Debug the output of find module on pgnode1
       debug:
