@@ -432,8 +432,8 @@
     
     - name: Copy CFSSL files to pgnode1
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
-        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}"
+        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
+        dest: /etc/ssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
         owner: etcd
         group: etcd
         mode: '0644'
@@ -442,8 +442,8 @@
     
     - name: Copy CFSSL files to pgnode2
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
-        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}"
+        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
+        dest: /etc/ssl/{{ item.path | basename | regex_replace('[''\"'']', '') }}"
         owner: etcd
         group: etcd
         mode: '0644'
