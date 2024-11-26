@@ -442,7 +442,7 @@
       when: inventory_hostname == '192.168.1.21'
 
     - name: Copy CFSSL files to other hosts
-      copy:
+      fetch:
         src: "{{ item.path }}"
         dest: /etc/ssl/{{ item.path | basename }}
 #        owner: etcd
@@ -450,6 +450,7 @@
 #        mode: '0644'
 #        remote_src: true
         force: true
+        flat: yes
       loop: "{{ cfssl_files.files }}"
       delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.22'
