@@ -438,7 +438,7 @@
     - name: Copy CFSSL files to pgnode1
       copy:
         src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}"
+        dest: /etc/ssl/{{ item.path | basename }}
         owner: etcd
         group: etcd
         mode: '0644'
