@@ -383,41 +383,24 @@
 
     - name: Execute generate-root-ca.sh
       shell: /root/cfssl/generate-root-ca.sh
-#      command: /root/cfssl/generate-root-ca.sh
       become: yes
       when: inventory_hostname == '192.168.1.21'
 
     - name: Execute generate-cluster-certs.sh
-#      command: /root/cfssl/generate-cluster-certs.sh
       shell: /root/cfssl/generate-cluster-certs.sh
       become: yes
       when: inventory_hostname == '192.168.1.21'
 
 #######################################################################################################################
-#- name: Copy CFSSL
-#  hosts: all
-#  gather_facts: true
-#  become: yes
-#  become_user: root
-#  vars_files:
-#    - main.yml
-
-#  tasks:
-
     - name: Find CFSSL files on pgnode1
       find:
         paths: /root/cfssl
         file_type: file
         patterns: "*.pem"
       register: cfssl_files
-#      when: inventory_hostname == '192.168.1.21'
       delegate_to: 192.168.1.21
       run_once: true      
 
-#    - name: Set cfssl_files to an empty list for other hosts
-#      set_fact:
-#        cfssl_files: {"files": []}
-#      when: inventory_hostname != '192.168.1.21'
     - name: Ensure local directory for fetched files
       file:
         path: /tmp/cfssl/
@@ -432,8 +415,6 @@
         flat: yes
       loop: "{{ cfssl_files.files | default([]) }}"
       delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#      loop: "{{ cfssl_files.files | default([]) }}"
 
     - name: Copy CFSSL files to pgnode1
       copy:
@@ -442,386 +423,19 @@
         owner: etcd
         group: etcd
         mode: '0644'
-#        remote_src: true
         force: true
       loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
       when: inventory_hostname == '192.168.1.21'
-
-#    - name: fetch CFSSL files to other hosts
-#      fetch:
-#        src: "{{ item.path }}"
-#        dest: "/tmp/{{ item.path | basename }}"
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#        remote_src: true
-#        force: true
-#        flat: yes
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.22'
 
     - name: Copy CFSSL files to other hosts
       copy:
         src: "/tmp/cfssl/{{ item.path | basename }}"
         dest: /etc/ssl/{{ item.path | basename }}
-#        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
-#        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}
         owner: etcd
         group: etcd
         mode: '0644'
-#        remote_src: true
         force: true
-#        flat: yes
       loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
       when: inventory_hostname != '192.168.1.21'
 
-    - name: Debug the output of find module on pgnode1
-      debug:
-        var: cfssl_files
-      when: inventory_hostname == '192.168.1.21'
-
-    - name: Debug the output of find module
-      debug:
-        var: cfssl_files.files
-#    - name: Copy CFSSL files using rsync
-#      command: >
-#        rsync -avz /root/cfssl/{{ item.path | basename }}
-#        root@192.168.1.22:/etc/ssl/
-#      delegate_to: 192.168.1.21
-#      loop: "{{ cfssl_files.files }}"
-#      when: inventory_hostname != '192.168.1.21'
-
-
-
-#    - name: Copy CFSSL files from pgnode1 to target hosts
-#      ansible.posix.synchronize:
-#        src: "{{ item.path }}"
-#        dest: rsync://192.168.1.22/etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#        remote_src: true
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-
-
-#      - name: Copy CFSSL files from pgnode1 to target hosts
-#      copy:
-#        src: "{{ item.path }}"
-#        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#        remote_src: true
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Copy CFSSL files from pgnode1 to target hosts
-#      copy:
-#        src: "{{ item.path }}"
-#        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#        remote_src: true
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy CFSSL files from pgnode1 to target hosts
-#      copy:
-#        src: "{{ item.path }}"
-#        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#        remote_src: true
-#      loop: "{{ cfssl_files.files }}"
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.23'
-#      #    - name: Copy CFSSL files to target hosts
-##      copy:
-#        src: /tmp/cfssl/{{ item.path | basename }}
-#        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-##      when: inventory_hostname == '192.168.1.21,192.168.1.22,192.168.1.23'
-#      loop: "{{ cfssl_files.files | default([]) }}"
-
-
-
-#    - name: Find CFSSL files on pgnode1
-#      find:
-#        paths: /root/cfssl
-#        file_type: file
-#        patterns: "*.pem"
-#      register: cfssl_files
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Fetch CFSSL files
-#      fetch:
-#        src: "{{ item.path }}"
-#        dest: /tmp/cfssl/
-#        flat: yes
-#      when: inventory_hostname == '192.168.1.21'
-#      loop: "{{ cfssl_files.files }}"
-#
-#
-#    - name: Copy CFSSL files to target hosts
-#      copy:
-#        src: /tmp/cfssl/{{ item.path | basename }}
-#        dest: /etc/ssl/{{ item.path | basename }}
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      when: inventory_hostname != '192.168.1.21'
-#      loop: "{{ cfssl_files.files }}"
-
-
-
-
-#
-#    - name: Fetch file from pgnode1
-#      ansible.builtin.fetch:
-#        src: /root/cfssl/ca.pem
-#        dest: /tmp/ca.pem
-#        flat: yes
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Copy file to pgnode2
-#      ansible.builtin.copy:
-#        src: /tmp/ca.pem
-#        dest: /etc/ssl/ca.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.22
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy file to pgnode3
-#      ansible.builtin.copy:
-#        src: /tmp/ca.pem
-#        dest: /etc/ssl/ca.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.23
-#      when: inventory_hostname == '192.168.1.23'      
-#
-#
-#      - name: Fetch file from pgnode1
-#      ansible.builtin.fetch:
-#        src: /root/cfssl/server.pem
-#        dest: /tmp/server.pem
-#        flat: yes
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Copy file to pgnode2
-#      ansible.builtin.copy:
-#        src: /tmp/server.pem
-#        dest: /etc/ssl/server.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.22
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy file to pgnode3
-#      ansible.builtin.copy:
-#        src: /tmp/server.pem
-#        dest: /etc/ssl/server.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.23
-#      when: inventory_hostname == '192.168.1.23'         
-#
-#      - name: Fetch file from pgnode1
-#      ansible.builtin.fetch:
-#        src: /root/cfssl/client.pem
-#        dest: /tmp/client.pem
-#        flat: yes
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Copy file to pgnode2
-#      ansible.builtin.copy:
-#        src: /tmp/client.pem
-#        dest: /etc/ssl/client.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.22
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy file to pgnode3
-#      ansible.builtin.copy:
-#        src: /tmp/client.pem
-#        dest: /etc/ssl/client.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.23
-#      when: inventory_hostname == '192.168.1.23'
-#
-#      - name: Fetch file from pgnode1
-#      ansible.builtin.fetch:
-#        src: /root/cfssl/pgnode1.pem
-#        dest: /tmp/pgnode1.pem
-#        flat: yes
-#      delegate_to: 192.168.1.21
-#      when: inventory_hostname == '192.168.1.21'
-#
-#    - name: Copy file to pgnode2
-#      ansible.builtin.copy:
-#        src: /tmp/pgnode1.pem
-#        dest: /etc/ssl/pgnode1.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.22
-#      when: inventory_hostname == '192.168.1.22'
-#
-#    - name: Copy file to pgnode3
-#      ansible.builtin.copy:
-#        src: /tmp/pgnode1.pem
-#        dest: /etc/ssl/pgnode1.pem
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#      delegate_to: 192.168.1.23
-#      when: inventory_hostname == '192.168.1.23'
-#
-#      
-#      ##################################################copy file#####################################################################
-##    - name: Copy file to target folder with correct owner and permissions
-##      ansible.builtin.copy:
-###        src: "{{ etcd_config_file }}"
-###        dest: "{{ etcd_config_file }}.bak"
-##        src: /root/cfssl/ca.pem
-##        dest: /etc/ssl/ca.pem
-##        remote_src: true
-##        owner: etcd
-##        group: etcd
-##        mode: '0644'
-##
-##    - name: Copy file to target folder with correct owner and permissions
-##      ansible.builtin.copy:
-###      copy:
-##        src: /root/cfssl/ca-key.pem
-##        dest: /etc/ssl/ca-key.pem
-##        remote_src: true
-##        owner: etcd
-##        group: etcd
-##        mode: '0644'        
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/server.pem
-#        dest: /etc/ssl/server.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/server-key.pem
-#        dest: /etc/ssl/server-key.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/client.pem
-#        dest: /etc/ssl/client.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/client-key.pem
-#        dest: /etc/ssl/client-key.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode1.pem
-#        dest: /etc/ssl/pgnode1.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode1-key.pem
-#        dest: /etc/ssl/pgnode1-key.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode2.pem
-#        dest: /etc/ssl/pgnode2.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode2-key.pem
-#        dest: /etc/ssl/pgnode2-key.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode3.pem
-#        dest: /etc/ssl/pgnode3.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#    - name: Copy file to target folder with correct owner and permissions
-#      ansible.builtin.copy:
-##      copy:
-#        src: /root/cfssl/pgnode3-key.pem
-#        dest: /etc/ssl/pgnode3-key.pem
-#        remote_src: true
-#        owner: etcd
-#        group: etcd
-#        mode: '0644'
-#
-#
 ...
