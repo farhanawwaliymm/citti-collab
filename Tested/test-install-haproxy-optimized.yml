@@ -56,8 +56,14 @@
         removes: "my-haproxy.pp"
       register: selinux_haproxy_policy_install
 
+#    - name: Generate SELinux policy module for keepalived
+#      ansible.builtin.shell: "ausearch -c keepalived --raw | audit2allow -M my-keepalived"
+#      args:
+#        creates: "my-keepalived.pp"
+#      register: selinux_keepalived_policy_module
+
     - name: Generate SELinux policy module for keepalived
-      ansible.builtin.shell: "ausearch -c keepalived --raw | audit2allow -M my-keepalived"
+      ansible.builtin.shell: "ausearch -c 'keepalived' --raw | audit2allow -M my-keepalived"
       args:
         creates: "my-keepalived.pp"
       register: selinux_keepalived_policy_module
