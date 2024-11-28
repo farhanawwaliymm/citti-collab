@@ -464,8 +464,10 @@
 
     - name: Copy CFSSL files to other hosts
       copy:
-        src: "/tmp/cfssl/{{ item.path | basename }}"
-        dest: /etc/ssl/{{ item.path | basename }}"
+#        src: "/tmp/cfssl/{{ item.path | basename }}"
+#        dest: /etc/ssl/{{ item.path | basename }}"
+        src: "/tmp/cfssl/{{ item.path | basename | regex_replace('["\']', '') }}"
+        dest: /etc/ssl/{{ item.path | basename | regex_replace('["\']', '') }}
         owner: etcd
         group: etcd
         mode: '0644'
